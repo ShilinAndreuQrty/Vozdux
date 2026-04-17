@@ -7,548 +7,198 @@
   <script src="https://unpkg.com/feather-icons"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #00e6c3;
-      --primary-dark: #00b89c;
-      --accent: #3b82f6;
-      --accent-glow: #60a5fa;
-      --bg: #0b1120;
-      --bg-soft: #111b2b;
-      --card-bg: rgba(18, 30, 45, 0.85);
-      --glass-border: rgba(56, 189, 248, 0.15);
-      --text-main: #f0f9ff;
-      --text-muted: #94a3b8;
-      --border: #1e2b3c;
-      --radius-lg: 24px;
-      --radius-md: 18px;
-      --shadow-glow: 0 20px 35px -8px rgba(0, 230, 195, 0.1);
-      --transition-smooth: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+      --primary: #00e6c3; --primary-dark: #00b89c; --bg: #0b1120;
+      --card-bg: rgba(18, 30, 45, 0.85); --text-main: #f0f9ff;
+      --text-muted: #94a3b8; --border: #1e2b3c; --radius-lg: 24px;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
-      color: var(--text-main);
-      line-height: 1.5;
-      min-height: 100vh;
-      padding: 24px 20px;
-      -webkit-font-smoothing: antialiased;
-      position: relative;
-      isolation: isolate;
-    }
-
-    /* ВОЛНИСТЫЙ ФОН */
-    .wave-bg {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-      opacity: 0.25;
-      pointer-events: none;
-    }
-
-    .wave {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(circle at 30% 40%, rgba(0, 230, 195, 0.06) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.08) 0%, transparent 55%);
-    }
-
-    .wave::before,
-    .wave::after {
-      content: "";
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      top: -50%;
-      left: -50%;
-      background: transparent;
-      background-image: 
-        radial-gradient(circle at 20% 30%, rgba(0, 230, 195, 0.02) 0%, transparent 25%),
-        radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 30%),
-        radial-gradient(circle at 40% 70%, rgba(0, 184, 156, 0.02) 0%, transparent 35%);
-      animation: waveMove 28s infinite alternate ease-in-out;
-    }
-
-    .wave::after {
-      background-image: 
-        radial-gradient(circle at 70% 60%, rgba(0, 230, 195, 0.03) 0%, transparent 30%),
-        radial-gradient(circle at 10% 80%, rgba(96, 165, 250, 0.04) 0%, transparent 40%);
-      animation: waveMove2 35s infinite alternate ease-in-out;
-      opacity: 0.7;
-    }
-
-    @keyframes waveMove {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-5%, -3%) scale(1.05); }
-      100% { transform: translate(3%, 5%) scale(0.98); }
-    }
-    @keyframes waveMove2 {
-      0% { transform: translate(0, 0) scale(1.1); }
-      100% { transform: translate(5%, -4%) scale(0.95); }
-    }
-
-    .container { max-width: 1300px; margin: 0 auto; position: relative; z-index: 1; }
-
-    .feather { width: 22px; height: 22px; stroke-width: 2; stroke: currentColor; fill: none; vertical-align: middle; margin-right: 6px; }
-
-    /* Навигация */
-    .app-nav {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 40px; padding: 8px 4px;
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(8px);
-    }
-    .logo { display: flex; align-items: center; gap: 12px; }
-    .logo-icon {
-      background: linear-gradient(145deg, var(--primary), var(--accent));
-      width: 42px; height: 42px; border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 20px; color: #0b1120;
-    }
-    .logo span {
-      font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em;
-      background: linear-gradient(to right, #fff, var(--primary));
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .nav-tabs {
-      display: flex; gap: 8px; background: rgba(12, 25, 40, 0.6);
-      padding: 6px; border-radius: 50px; backdrop-filter: blur(10px);
-      border: 1px solid var(--border);
-    }
-    .nav-link {
-      padding: 10px 22px; border-radius: 40px; font-weight: 600;
-      color: var(--text-muted); text-decoration: none; transition: var(--transition-smooth);
-      display: flex; align-items: center; gap: 8px;
-    }
-    .nav-link.active { background: var(--primary); color: #0b1120; box-shadow: 0 4px 12px rgba(0, 230, 195, 0.3); }
-    .page { display: none; opacity: 0; transition: opacity 0.4s ease; }
-    .page.active { display: block; opacity: 1; }
-
-    header { text-align: center; margin-bottom: 40px; }
-    header h1 {
-      font-size: 3rem; font-weight: 800;
-      background: linear-gradient(135deg, #fff 0%, var(--primary) 70%);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      margin-bottom: 12px; letter-spacing: -0.03em;
-    }
-    .subhead { color: var(--text-muted); font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
-
-    /* Пресеты */
-    .presets-row {
-      display: flex; gap: 16px; margin-bottom: 36px; flex-wrap: wrap;
-    }
-    .preset-card {
-      flex: 1; min-width: 160px;
-      background: rgba(18, 30, 45, 0.6); backdrop-filter: blur(12px);
-      border: 2px solid var(--border); border-radius: 24px;
-      padding: 22px 18px; cursor: pointer;
-      transition: var(--transition-smooth);
-    }
-    .preset-card:hover {
-      border-color: var(--primary);
-      transform: translateY(-4px);
-      background: rgba(0, 230, 195, 0.05);
-    }
-    .preset-card.active-preset {
-      border-color: var(--primary);
-      background: rgba(0, 230, 195, 0.08);
-      box-shadow: 0 0 20px rgba(0,230,195,0.1);
-    }
-    .preset-title {
-      font-weight: 700; font-size: 1.2rem; display: flex; gap: 8px; margin-bottom: 8px;
-    }
-    .preset-desc { font-size: 0.85rem; color: var(--text-muted); }
-
-    /* ФИЛЬТР — ВЫПАДАЮЩИЕ ОКНА */
-    .filter-section {
-      background: var(--card-bg); backdrop-filter: blur(16px);
-      padding: 24px 28px; border-radius: var(--radius-lg);
-      border: 1px solid var(--glass-border); margin-bottom: 40px;
-    }
-    .filter-grid {
-      display: grid; grid-template-columns: 1fr; gap: 20px;
-    }
-    @media (min-width: 768px) { .filter-grid { grid-template-columns: 1.5fr 1.2fr 1fr; align-items: end; } }
-    
-    .custom-select {
-      position: relative;
-    }
-    .select-header {
-      background: #0e1a26; border: 1.5px solid var(--border);
-      padding: 14px 18px; border-radius: 18px;
-      display: flex; align-items: center; justify-content: space-between;
-      cursor: pointer; transition: var(--transition-smooth);
-    }
-    .select-header:hover { border-color: var(--primary); }
-    .select-header i { margin-right: 0; }
-    .select-options {
-      position: absolute; top: calc(100% + 8px); left: 0; right: 0;
-      background: #132433; border: 1.5px solid var(--border);
-      border-radius: 18px; padding: 8px;
-      backdrop-filter: blur(20px);
-      opacity: 0; visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.25s ease;
-      z-index: 10;
-      box-shadow: 0 15px 30px -10px black;
-    }
-    .custom-select.active .select-options {
-      opacity: 1; visibility: visible;
-      transform: translateY(0);
-    }
-    .select-option {
-      padding: 12px 16px; border-radius: 14px;
-      cursor: pointer; transition: background 0.2s;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .select-option:hover { background: rgba(0,230,195,0.1); }
-    .select-option.active { background: rgba(0,230,195,0.15); color: var(--primary); }
-
-    .btn {
-      background: linear-gradient(105deg, var(--primary), #00c6b0); border: none;
-      padding: 15px 24px; border-radius: 18px; font-weight: 700; font-size: 1rem;
-      color: #0b1120; cursor: pointer; transition: var(--transition-smooth);
-      box-shadow: 0 10px 20px -6px rgba(0, 230, 195, 0.3); width: 100%;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-
-    /* Карточки — вся информация видна */
-    .results-grid {
-      display: grid; grid-template-columns: 1fr; gap: 24px;
-    }
-    @media (min-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (min-width: 1200px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
-
-    .bond-card {
-      background: var(--card-bg); backdrop-filter: blur(12px);
-      border-radius: 26px; padding: 24px; border: 1px solid var(--glass-border);
-      transition: var(--transition-smooth);
-    }
-    .bond-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-    .badge {
-      display: inline-block; padding: 5px 12px; border-radius: 30px;
-      font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
-      margin-bottom: 18px; background: #1e3a8a30; color: #60a5fa;
-    }
-    .badge.corp { background: #0f766e20; color: var(--primary); }
-    .bond-name { font-size: 1.4rem; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
-    .yield-big {
-      background: #0b1722; border-radius: 20px; padding: 16px 18px;
-      display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px;
-    }
-    .yield-number { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
-    .detail-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.9rem; }
-    .info-divider { margin: 18px 0 14px; border-top: 1px dashed var(--border); }
-    .extra-info { background: rgba(0,0,0,0.2); border-radius: 16px; padding: 14px; margin-top: 16px; }
-
-    /* Аналитика — тусклые диаграммы */
-    .stats-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin: 30px 0; }
-    @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
-    .stat-card {
-      background: var(--card-bg); backdrop-filter: blur(12px);
-      border-radius: 28px; padding: 28px; border: 1px solid var(--glass-border);
-    }
-    .pie-container {
-      display: flex; justify-content: center; margin: 20px 0;
-      position: relative;
-    }
-    .pie-glow {
-      position: absolute;
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, rgba(0,230,195,0.08) 0%, transparent 70%);
-      border-radius: 50%; filter: blur(18px); z-index: 0;
-    }
-    canvas { max-width: 200px; max-height: 200px; position: relative; z-index: 2; opacity: 0.9; }
-/* Стилизованный выпадающий список */
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: linear-gradient(135deg, #0e1a26 0%, #0a121c 100%);
-  border: 1.5px solid var(--border);
-  color: var(--text-main);
-  padding: 14px 20px;
-  border-radius: 18px;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: var(--transition-smooth);
-  outline: none;
-  cursor: pointer;
-  position: relative;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300e6c3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  background-size: 18px;
-  backdrop-filter: blur(10px);
-}
-
-select:hover {
-  border-color: var(--primary);
-  background: linear-gradient(135deg, #121f2e 0%, #0c1622 100%);
-  box-shadow: 0 4px 15px rgba(0, 230, 195, 0.15);
-}
-
-select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(0, 230, 195, 0.2), 0 4px 15px rgba(0, 230, 195, 0.1);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300e6c3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='18 15 12 9 6 15'%3E%3C/polyline%3E%3C/svg%3E");
-}
-
-/* Стилизация опций (работает в большинстве современных браузеров) */
-select option {
-  background: #0e1a26;
-  color: var(--text-main);
-  padding: 12px;
-  border: none;
-  font-weight: 500;
-}
-
-select option:hover,
-select option:focus,
-select option:checked {
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-  color: #0b1120;
-}
-
-/* Кастомный дропдаун для контейнера с select (дополнительно) */
-.form-group {
-  position: relative;
-}
-
-.form-group select {
-  width: 100%;
-}
-
-/* Анимация при фокусе на select */
-@keyframes selectGlow {
-  0% { box-shadow: 0 0 0 0 rgba(0, 230, 195, 0.3); }
-  100% { box-shadow: 0 0 0 4px rgba(0, 230, 195, 0.1); }
-}
-
-select:focus {
-  animation: selectGlow 0.5s ease-out;
-}
-
-/* Стиль для disabled select */
-select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-}
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); padding: 20px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .app-nav { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+    .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+    .filter-section { background: var(--card-bg); padding: 25px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 30px; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
+    input, select { width: 100%; background: #0e1a26; border: 1.5px solid var(--border); color: white; padding: 12px; border-radius: 12px; outline: none; }
+    .btn { background: var(--primary); border: none; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 20px; transition: 0.3s; }
+    .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .bond-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); transition: 0.3s; }
+    .bond-card:hover { border-color: var(--primary); }
+    .badge { background: rgba(0, 230, 195, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
+    .bond-name { font-size: 1.2rem; font-weight: 700; margin: 10px 0; }
+    .yield-big { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .yield-number { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-muted); }
+    .detail-row strong { color: white; }
   </style>
 </head>
 <body>
-<div class="wave-bg"><div class="wave"></div></div>
 <div class="container">
   <div class="app-nav">
-    <div class="logo"><div class="logo-icon">B</div><span>BondSelect</span></div>
-    <div class="nav-tabs">
-      <a href="#" class="nav-link active" data-page="page-select"><i data-feather="search"></i>Подбор</a>
-      <a href="#" class="nav-link" data-page="page-analytics"><i data-feather="pie-chart"></i>Аналитика</a>
-    </div>
+    <div class="logo">BONDSELECT</div>
+    <div style="color: var(--text-muted)">Hackathon Edition</div>
   </div>
 
-  <!-- СТРАНИЦА ПОДБОРА -->
-  <div id="page-select" class="page active">
-    <header>
-      <h1>Умный подбор облигаций</h1>
-      <div class="subhead"><i data-feather="trending-up"></i> Выберите стратегию или настройте фильтры</div>
-    </header>
-
-    <div class="presets-row">
-      <div class="preset-card active-preset" data-preset="conservative">
-        <div class="preset-title"><i data-feather="shield"></i>Консервативный</div>
-        <div class="preset-desc">Низкий риск, ОФЗ + AAA, 1 год</div>
+  <div class="filter-section">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label>Сумма инвестиций (₽)</label>
+        <input type="number" id="amount" value="50000">
       </div>
-      <div class="preset-card" data-preset="balanced">
-        <div class="preset-title"><i data-feather="scale"></i>Сбалансированный</div>
-        <div class="preset-desc">Средний риск, корп. A-AA, 2 года</div>
+      <div class="form-group">
+        <label>Срок (месяцев)</label>
+        <select id="duration">
+          <option value="3">3 месяца</option>
+          <option value="6">6 месяцев</option>
+          <option value="12" selected>1 год (12 мес.)</option>
+          <option value="24">2 года (24 мес.)</option>
+        </select>
       </div>
-      <div class="preset-card" data-preset="aggressive">
-        <div class="preset-title"><i data-feather="zap"></i>Агрессивный</div>
-        <div class="preset-desc">Высокий риск, BBB+, 3 года</div>
+      <div class="form-group">
+        <label>Уровень риска</label>
+        <select id="risk">
+          <option value="low">Низкий (ОФЗ)</option>
+          <option value="medium">Средний (A-AA)</option>
+          <option value="high">Высокий (BBB+)</option>
+        </select>
       </div>
     </div>
-
-    <div class="filter-section">
-      <div class="filter-grid">
-        <div class="form-group">
-          <label><i data-feather="dollar-sign"></i>Сумма (₽)</label>
-          <input type="number" id="amount" min="1000" value="50000" step="1000" style="background:#0e1a26; border:1.5px solid var(--border); color:white; padding:14px 18px; border-radius:18px;">
-        </div>
-        
-        <!-- ВЫПАДАЮЩИЙ СПИСОК СРОК -->
-        <div class="custom-select" id="termSelect">
-          <label><i data-feather="calendar"></i>Срок</label>
-          <div class="select-header">
-            <span id="selectedTermText">1 год (12 мес.)</span>
-            <i data-feather="chevron-down"></i>
-          </div>
-          <div class="select-options">
-            <div class="select-option" data-value="3">3 месяца</div>
-            <div class="select-option" data-value="6">6 месяцев</div>
-            <div class="select-option active" data-value="12">1 год (12 мес.)</div>
-            <div class="select-option" data-value="24">2 года (24 мес.)</div>
-            <div class="select-option" data-value="36">3 года (36 мес.)</div>
-          </div>
-        </div>
-        
-        <!-- ВЫПАДАЮЩИЙ СПИСОК РИСК (доп. фильтр) -->
-        <div class="custom-select" id="riskSelect">
-          <label><i data-feather="shield"></i>Уровень риска</label>
-          <div class="select-header">
-            <span id="selectedRiskText">Низкий</span>
-            <i data-feather="chevron-down"></i>
-          </div>
-          <div class="select-options">
-            <div class="select-option active" data-value="low">Низкий</div>
-            <div class="select-option" data-value="medium">Средний</div>
-            <div class="select-option" data-value="high">Высокий</div>
-          </div>
-        </div>
-      </div>
-      <button class="btn" id="applyFilterBtn" style="margin-top:24px;"><i data-feather="filter"></i>Применить фильтры</button>
-    </div>
-
-    <div id="resultsContainer" class="results-grid"></div>
+    <button class="btn" id="applyFilterBtn">НАЙТИ ОБЛИГАЦИИ</button>
   </div>
 
-  <!-- АНАЛИТИКА -->
-  <div id="page-analytics" class="page">
-    <header><h1>Аналитика рынка</h1></header>
-    <div class="stats-grid">
-      <div class="stat-card"><h3>ОФЗ / Корпоративные</h3><div class="pie-container"><div class="pie-glow"></div><canvas id="pieTypeChart" width="200" height="200"></canvas></div></div>
-      <div class="stat-card"><h3>По рейтингу</h3><div class="pie-container"><div class="pie-glow"></div><canvas id="pieRatingChart" width="200" height="200"></canvas></div></div>
-    </div>
-    <div class="stat-card"><h3>Топ-5 доходных</h3><div id="topYieldList"></div></div>
-  </div>
+  <div id="resultsContainer" class="results-grid"></div>
 </div>
 
 <script>
-    (function(){
-  feather.replace();
-  
-  var currentTerm = 12; 
-  var currentRisk = 'low';
-  var API_URL = 'http://127.0.0.1:8000/analyze/analyze';
-
-  var riskMapping = { 'low': 1, 'medium': 2, 'high': 3 };
-
-  async function fetchBondsData(amount, riskStr, termMonths) {
-    var payload = {
-      amount: amount,
-      risk: riskMapping[riskStr],
-      duration: termMonths
-    };
-
-    try {
-      var response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) throw new Error('Ошибка бэкенда');
-      return await response.json();
-    } catch (error) {
-      console.error("Ошибка:", error);
-      return null;
-    }
-  }
-
-  async function applyAndRender() {
-    var amtInput = document.getElementById('amount');
-    var amount = parseInt(amtInput.value) || 50000;
-    var container = document.getElementById('resultsContainer');
-    
-    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #00e6c3;">Загрузка...</div>';
-
-    var apiData = await fetchBondsData(amount, currentRisk, currentTerm);
-
-    container.innerHTML = ''; 
-
-    if (!apiData) {
-      container.innerHTML = '<div style="grid-column: 1/-1; color: #ff4444; text-align:center;">Ошибка связи с бэкендом (проверьте консоль F12)</div>';
-      return;
-    }
-
-    if (apiData.explanation) {
-      var exDiv = document.createElement('div');
-      exDiv.className = 'bond-card';
-      exDiv.style.gridColumn = '1 / -1';
-      exDiv.innerHTML = '<h3>Вердикт алгоритма</h3><p>' + apiData.explanation + '</p>';
-      container.appendChild(exDiv);
-    }
-
-    if (apiData.best_bond) container.appendChild(createBondCard(apiData.best_bond, true));
-    if (apiData.alternatives) {
-      apiData.alternatives.forEach(function(b) { container.appendChild(createBondCard(b, false)); });
-    }
+(function() {
     feather.replace();
-  }
 
-  function createBondCard(bond, isBest) {
-    var card = document.createElement('div');
-    card.className = 'bond-card';
-    if (isBest) card.style.borderColor = '#00e6c3';
+    // ТОЧНЫЙ АДРЕС: префикс /analyze + роутер /
+    const API_URL = "http://127.0.0.1:8000/analyze/";
     
-    var rText = bond.risk === 1 ? 'Низкий' : (bond.risk === 2 ? 'Средний' : 'Высокий');
-    
-    card.innerHTML = 
-      '<span class="badge">' + (isBest ? '★ Лучший выбор' : 'Альтернатива') + '</span>' +
-      '<div class="bond-name">' + bond.name + ' <small>' + bond.ticker + '</small></div>' +
-      '<div class="yield-big"><span>Доходность</span><span class="yield-number">' + bond.yield_percent + '%</span></div>' +
-      '<div class="detail-row"><span>Цена</span><strong>' + bond.price + ' ₽</strong></div>' +
-      '<div class="detail-row"><span>Риск</span><strong>' + rText + '</strong></div>' +
-      '<div class="detail-row"><span>Срок</span><strong>' + bond.duration + ' мес.</strong></div>';
-    return card;
-  }
+    let currentTerm = 12;
+    let currentRisk = 'low';
+    const riskMapping = { 'low': 1, 'medium': 2, 'high': 3 };
 
-  // Привязка кликов к селекторам
-  document.querySelectorAll('.custom-select').forEach(function(select) {
-    var header = select.querySelector('.select-header');
-    header.addEventListener('click', function(e) {
-      e.stopPropagation();
-      select.classList.toggle('active');
-    });
-    
-    select.querySelectorAll('.select-option').forEach(function(opt) {
-      opt.addEventListener('click', function() {
-        if (select.id === 'termSelect') {
-          currentTerm = parseInt(opt.dataset.value);
-          document.getElementById('selectedTermText').innerText = opt.innerText;
-        } else {
-          currentRisk = opt.dataset.value;
-          document.getElementById('selectedRiskText').innerText = opt.innerText;
+    async function fetchBondsData(amount, riskStr, termMonths) {
+        const payload = {
+            amount: parseFloat(amount),
+            risk: riskMapping[riskStr],
+            duration: parseInt(termMonths)
+        };
+
+        console.log("Отправка JSON:", payload);
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error('Ошибка: ' + response.status);
+            return await response.json();
+        } catch (error) {
+            console.error("Ошибка подключения к бэкенду:", error);
+            return null;
         }
-        select.classList.remove('active');
-      });
+    }
+
+    async function applyAndRender() {
+        const amtInput = document.getElementById('amount');
+        const amount = parseInt(amtInput.value) || 50000;
+        const container = document.getElementById('resultsContainer');
+        
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #00e6c3;">Связь с сервером...</div>';
+
+        const apiData = await fetchBondsData(amount, currentRisk, currentTerm);
+
+        container.innerHTML = ''; 
+
+        if (!apiData) {
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; color: #ff4444; text-align:center; padding: 20px; border: 1px solid #ff4444; border-radius: 15px;">
+                    Сервер Никиты не отвечает. <br>
+                    Убедись, что запущен uvicorn и адрес "${API_URL}" верен.
+                </div>`;
+            return;
+        }
+
+        // Вывод объяснения (сейчас там: "Дмитрий Пономарёв лох")
+        if (apiData.explanation) {
+            const exDiv = document.createElement('div');
+            exDiv.className = 'bond-card';
+            exDiv.style.gridColumn = '1 / -1';
+            exDiv.innerHTML = `<h3>Вердикт системы</h3><p>${apiData.explanation}</p>`;
+            container.appendChild(exDiv);
+        }
+
+        // Рендерим лучшую облигацию (поле "best")
+        if (apiData.best) {
+            container.appendChild(createBondCard(apiData.best, true));
+        } else if (!apiData.alternatives || apiData.alternatives.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.gridColumn = '1 / -1';
+            emptyDiv.style.textAlign = 'center';
+            emptyDiv.innerHTML = '<p style="color: var(--text-muted)">Бэкенд пока не вернул подходящих облигаций.</p>';
+            container.appendChild(emptyDiv);
+        }
+
+        // Рендерим альтернативы
+        if (apiData.alternatives && Array.isArray(apiData.alternatives)) {
+            apiData.alternatives.forEach(b => container.appendChild(createBondCard(b, false)));
+        }
+        
+        feather.replace();
+    }
+
+    function createBondCard(bond, isBest) {
+        const card = document.createElement('div');
+        card.className = 'bond-card';
+        if (isBest) card.style.borderColor = 'var(--primary)';
+        
+        const rText = bond.risk === 1 ? 'Низкий' : (bond.risk === 2 ? 'Средний' : 'Высокий');
+        
+        card.innerHTML = `
+            <span class="badge">${isBest ? '★ Лучший выбор' : 'Альтернатива'}</span>
+            <div class="bond-name">${bond.name || 'Без названия'} <small>${bond.ticker || ''}</small></div>
+            <div class="yield-big"><span>Доходность</span><span class="yield-number">${bond.yield_percent || 0}%</span></div>
+            <div class="detail-row"><span>Цена</span><strong>${bond.price || 0} ₽</strong></div>
+            <div class="detail-row"><span>Риск</span><strong>${rText}</strong></div>
+            <div class="detail-row"><span>Срок</span><strong>${bond.duration || 0} мес.</strong></div>
+        `;
+        return card;
+    }
+
+    // Инициализация селекторов
+    document.querySelectorAll('.custom-select').forEach(select => {
+        const header = select.querySelector('.select-header');
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+            select.classList.toggle('active');
+        });
+        
+        select.querySelectorAll('.select-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (select.id === 'termSelect') {
+                    currentTerm = parseInt(opt.dataset.value);
+                    document.getElementById('selectedTermText').innerText = opt.innerText;
+                } else {
+                    currentRisk = opt.dataset.value;
+                    document.getElementById('selectedRiskText').innerText = opt.innerText;
+                }
+                select.classList.remove('active');
+            });
+        });
     });
-  });
 
-  document.getElementById('applyFilterBtn').addEventListener('click', applyAndRender);
+    document.getElementById('applyFilterBtn').addEventListener('click', applyAndRender);
 
-  // Навигация
-  document.querySelectorAll('.nav-link').forEach(function(l) {
-    l.addEventListener('click', function(e) {
-      e.preventDefault();
-      document.querySelectorAll('.nav-link').forEach(function(n){n.classList.remove('active')});
-      l.classList.add('active');
-      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
-      document.getElementById(l.dataset.page).classList.add('active');
-    });
-  });
-
-  applyAndRender();
+    // Первоначальный вызов
+    applyAndRender();
 })();
 </script>
 </body>
