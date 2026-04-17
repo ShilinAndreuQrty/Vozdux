@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BondSelect Pro — Умный подбор облигаций</title>
+  <script src="https://unpkg.com/feather-icons"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00e6c3; --primary-dark: #00b89c; --bg: #0b1120;
+      --card-bg: rgba(18, 30, 45, 0.85); --text-main: #f0f9ff;
+      --text-muted: #94a3b8; --border: #1e2b3c; --radius-lg: 24px;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); padding: 20px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .app-nav { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+    .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+    .filter-section { background: var(--card-bg); padding: 25px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 30px; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
+    input, select { width: 100%; background: #0e1a26; border: 1.5px solid var(--border); color: white; padding: 12px; border-radius: 12px; outline: none; }
+    .btn { background: var(--primary); border: none; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 20px; transition: 0.3s; }
+    .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+    .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .bond-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); transition: 0.3s; }
+    .bond-card:hover { border-color: var(--primary); }
+    .badge { background: rgba(0, 230, 195, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
+    .bond-name { font-size: 1.2rem; font-weight: 700; margin: 10px 0; }
+    .yield-big { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .yield-number { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+    .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-muted); }
+    .detail-row strong { color: white; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="app-nav">
+    <div class="logo">BONDSELECT</div>
+    <div style="color: var(--text-muted)">Hackathon Edition</div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label>Сумма инвестиций (₽)</label>
+        <input type="number" id="amount" value="50000">
+      </div>
+      <div class="form-group">
+        <label>Срок (месяцев)</label>
+        <select id="duration">
+          <option value="3">3 месяца</option>
+          <option value="6">6 месяцев</option>
+          <option value="12" selected>1 год (12 мес.)</option>
+          <option value="24">2 года (24 мес.)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Уровень риска</label>
+        <select id="risk">
+          <option value="low">Низкий (ОФЗ)</option>
+          <option value="medium">Средний (A-AA)</option>
+          <option value="high">Высокий (BBB+)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="applyFilterBtn">НАЙТИ ОБЛИГАЦИИ</button>
+  </div>
+
+  <div id="resultsContainer" class="results-grid"></div>
+</div>
+
+<script>
+(function() {
+    feather.replace();
+
+    // ТОЧНЫЙ АДРЕС: префикс /analyze + роутер /
+    const API_URL = "http://127.0.0.1:8000/analyze/";
+    
+    let currentTerm = 12;
+    let currentRisk = 'low';
+    const riskMapping = { 'low': 1, 'medium': 2, 'high': 3 };
+
+    async function fetchBondsData(amount, riskStr, termMonths) {
+        const payload = {
+            amount: parseFloat(amount),
+            risk: riskMapping[riskStr],
+            duration: parseInt(termMonths)
+        };
+
+        console.log("Отправка JSON:", payload);
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error('Ошибка: ' + response.status);
+            return await response.json();
+        } catch (error) {
+            console.error("Ошибка подключения к бэкенду:", error);
+            return null;
+        }
+    }
+
+    async function applyAndRender() {
+        const amtInput = document.getElementById('amount');
+        const amount = parseInt(amtInput.value) || 50000;
+        const container = document.getElementById('resultsContainer');
+        
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #00e6c3;">Связь с сервером...</div>';
+
+        const apiData = await fetchBondsData(amount, currentRisk, currentTerm);
+
+        container.innerHTML = ''; 
+
+        if (!apiData) {
+            container.innerHTML = `
+                <div style="grid-column: 1/-1; color: #ff4444; text-align:center; padding: 20px; border: 1px solid #ff4444; border-radius: 15px;">
+                    Сервер Никиты не отвечает. <br>
+                    Убедись, что запущен uvicorn и адрес "${API_URL}" верен.
+                </div>`;
+            return;
+        }
+
+        // Вывод объяснения (сейчас там: "Дмитрий Пономарёв лох")
+        if (apiData.explanation) {
+            const exDiv = document.createElement('div');
+            exDiv.className = 'bond-card';
+            exDiv.style.gridColumn = '1 / -1';
+            exDiv.innerHTML = `<h3>Вердикт системы</h3><p>${apiData.explanation}</p>`;
+            container.appendChild(exDiv);
+        }
+
+        // Рендерим лучшую облигацию (поле "best")
+        if (apiData.best) {
+            container.appendChild(createBondCard(apiData.best, true));
+        } else if (!apiData.alternatives || apiData.alternatives.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.gridColumn = '1 / -1';
+            emptyDiv.style.textAlign = 'center';
+            emptyDiv.innerHTML = '<p style="color: var(--text-muted)">Бэкенд пока не вернул подходящих облигаций.</p>';
+            container.appendChild(emptyDiv);
+        }
+
+        // Рендерим альтернативы
+        if (apiData.alternatives && Array.isArray(apiData.alternatives)) {
+            apiData.alternatives.forEach(b => container.appendChild(createBondCard(b, false)));
+        }
+        
+        feather.replace();
+    }
+
+    function createBondCard(bond, isBest) {
+        const card = document.createElement('div');
+        card.className = 'bond-card';
+        if (isBest) card.style.borderColor = 'var(--primary)';
+        
+        const rText = bond.risk === 1 ? 'Низкий' : (bond.risk === 2 ? 'Средний' : 'Высокий');
+        
+        card.innerHTML = `
+            <span class="badge">${isBest ? '★ Лучший выбор' : 'Альтернатива'}</span>
+            <div class="bond-name">${bond.name || 'Без названия'} <small>${bond.ticker || ''}</small></div>
+            <div class="yield-big"><span>Доходность</span><span class="yield-number">${bond.yield_percent || 0}%</span></div>
+            <div class="detail-row"><span>Цена</span><strong>${bond.price || 0} ₽</strong></div>
+            <div class="detail-row"><span>Риск</span><strong>${rText}</strong></div>
+            <div class="detail-row"><span>Срок</span><strong>${bond.duration || 0} мес.</strong></div>
+        `;
+        return card;
+    }
+
+    // Инициализация селекторов
+    document.querySelectorAll('.custom-select').forEach(select => {
+        const header = select.querySelector('.select-header');
+        header.addEventListener('click', (e) => {
+            e.stopPropagation();
+            select.classList.toggle('active');
+        });
+        
+        select.querySelectorAll('.select-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                if (select.id === 'termSelect') {
+                    currentTerm = parseInt(opt.dataset.value);
+                    document.getElementById('selectedTermText').innerText = opt.innerText;
+                } else {
+                    currentRisk = opt.dataset.value;
+                    document.getElementById('selectedRiskText').innerText = opt.innerText;
+                }
+                select.classList.remove('active');
+            });
+        });
+    });
+
+    document.getElementById('applyFilterBtn').addEventListener('click', applyAndRender);
+
+    // Первоначальный вызов
+    applyAndRender();
+})();
+</script>
+</body>
+</html>
