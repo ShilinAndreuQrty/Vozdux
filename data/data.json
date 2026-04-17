@@ -6,7 +6,7 @@
       "price": 985.50,
       "yield_percent": 8.25,
       "risk": 1,
-      "duration": "2.3 года"
+      "duration": 26
     },
     {
       "ticker": "RU000A1012Q5",
@@ -14,15 +14,15 @@
       "price": 1020.00,
       "yield_percent": 7.80,
       "risk": 2,
-      "duration": "3.1 года"
+      "duration": 37
     },
     {
       "ticker": "SU26210RMFS1",
       "name": "ОФЗ 26210",
-      "price": 995.75,
+      "price": 995.75,  
       "yield_percent": 8.10,
       "risk": 1,
-      "duration": "4.5 года"
+      "duration": 54
     },
     {
       "ticker": "RU000A0JWTN3",
@@ -30,7 +30,7 @@
       "price": 1015.20,
       "yield_percent": 8.40,
       "risk": 1,
-      "duration": "1.8 года"
+      "duration": 23
     },
     {
       "ticker": "RU000A1023R7",
@@ -38,7 +38,7 @@
       "price": 970.80,
       "yield_percent": 9.15,
       "risk": 2,
-      "duration": "5.2 года"
+      "duration": 62
     }
   ]
 }
