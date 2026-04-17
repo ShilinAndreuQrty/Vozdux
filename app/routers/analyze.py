@@ -3,7 +3,7 @@ from app.models import UserInput
 
 router = APIRouter()
 
-@router.post('/analyze')
+@router.post('/')
 def analyze(user_input: UserInput):
     return {
         "best" : None,
