@@ -1,0 +1,44 @@
+{
+  "bonds": [
+    {
+      "ticker": "SU26207RMFS3",
+      "name": "ОФЗ 26207",
+      "price": 985.50,
+      "yield_percent": 8.25,
+      "risk": "Низкий",
+      "duration": "2.3 года"
+    },
+    {
+      "ticker": "RU000A1012Q5",
+      "name": "Облигация Газпром 2025",
+      "price": 1020.00,
+      "yield_percent": 7.80,
+      "risk": "Средний",
+      "duration": "3.1 года"
+    },
+    {
+      "ticker": "SU26210RMFS1",
+      "name": "ОФЗ 26210",
+      "price": 995.75,
+      "yield_percent": 8.10,
+      "risk": "Низкий",
+      "duration": "4.5 года"
+    },
+    {
+      "ticker": "RU000A0JWTN3",
+      "name": "Облигация Сбербанк 2026",
+      "price": 1015.20,
+      "yield_percent": 8.40,
+      "risk": "Низкий",
+      "duration": "1.8 года"
+    },
+    {
+      "ticker": "RU000A1023R7",
+      "name": "Облигация ВТБ 2027",
+      "price": 970.80,
+      "yield_percent": 9.15,
+      "risk": "Средний",
+      "duration": "5.2 года"
+    }
+  ]
+}
