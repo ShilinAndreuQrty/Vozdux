@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import os
 import json
 
 def json_to_dataframe(json_path=None, json_data=None):
@@ -31,21 +30,27 @@ def json_to_dataframe(json_path=None, json_data=None):
         print(f"Ошибка при преобразовании JSON: {e}")
         return pd.DataFrame()
 
-# Изменить рабочую директорию на папку со скриптом (если нужно)
-print(os.getcwd())
-#script_dir = os.path.dirname(os.path.abspath(__file__))
-#os.chdir(script_dir)
-
 # Использование функции, установка названием строк "Название" облигации
 df = json_to_dataframe(json_path='data/data.json')
-#df.set_index('name',inplace=True)
 
-# Математический подсчёт рейтинга каждой облигации
-#df['price_sale']=(df['price']*(df['yield_percent'])/100)/df['duration']
-print(df)
+#print(df)
 #df.to_csv('pathpoint.csv')
 
 # Подготовка к выводу, вывод конечных данных
-#df.reset_index(inplace=True)
 #print(df)
 #df.to_json('export.json',orient='records',index=False)
+
+#exlanation
+values=[]
+for i in range(len(df['name'])):
+    values.append(i)
+df['rating']= values
+po=pd.Series(df.iloc[0,:])
+result=po
+
+explanation = (
+        f"Выбрана облигация {df.get('name','')} ({df.get('ticker','')}) с рейтингом {df.get('rating'):.4f}. "
+        f"Доходность {df.get('yield_percent')}%, риск {df.get('risk')}, сроком на {df.get('duration')} мес."
+)
+print(explanation)
+pd.to_json()
