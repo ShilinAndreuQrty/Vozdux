@@ -42,10 +42,6 @@ def calculate_bond_rating_array(
         - issuer_penalty
     )
 
-    discount = (1000.0 - price) / 1000.0
-#(1-risk*0,3)*duration*yield_percent
-#(yield_percent / 100.0)
-    rating = (normalized_yield * (1 - risk_penalty) * (1 - duration_penalty)) + (k3 * discount)
 
     return rating
 
@@ -110,6 +106,15 @@ def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tupl
 
     avg_yield = sum(float(b.get("yield_percent", 0)) for b in scored_bonds) / len(scored_bonds)
     
+
+    rating_map = {
+    1: "Государственный уровень надёжности",
+    2: "Крупная надёжная корпорация",
+    3: "Средняя компания, повышенный риск"
+    }
+
+    issuer_text = rating_map.get(best_issuer, "Неизвестно")
+
     # Простое объяснение: почему выбрали лучшую 
     short_explanation = (
     f"Выбрана облигация {best.get('name','')} ({best.get('ticker','')}) "
@@ -117,7 +122,7 @@ def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tupl
     f"Доходность: {best.get('yield_percent')}%.\n"
     f"Риск: {best.get('risk')}.\n"
     f"Срок: {best.get('duration')} мес.\n"
-    f"Рейтинг эмитента: {best.get('issuer_rating')}."
+    f"Рейтинг эмитента: {issuer_text}."
 )
 
     # Полное объяснение 
@@ -136,6 +141,7 @@ def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tupl
 
     return best, alternatives, {
     "short": short_explanation,
-    "full": full_explanation
+    "full": full_explanation,
+    "issuer_rating_text": issuer_text
 }
 

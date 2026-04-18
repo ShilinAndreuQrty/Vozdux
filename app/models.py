@@ -33,3 +33,7 @@ class AnalyzeResponse(BaseModel):
     alternatives: List[Bond]
     explanation: Explanation
     projection: Optional[dict]
+
+class GoalRequest(BaseModel):
+    amount: float
+    target_yield: float

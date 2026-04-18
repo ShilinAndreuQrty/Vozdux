@@ -5,6 +5,7 @@ from app.routers.analyze import router as analyze_router
 from app.routers.ticker import router as ticker_router
 from app.routers.health import router as health_router 
 from app.routers.top_bonds import router as top_router
+from app.routers.goal import router as goal_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -16,6 +17,7 @@ app.include_router(analyze_router, prefix='/analyze')
 app.include_router(ticker_router, prefix='/bonds')
 app.include_router(health_router, prefix = '/health')
 app.include_router(top_router, prefix='/top')
+app.include_router(goal_router, prefix='/goal')
 
 app.add_middleware(
     CORSMiddleware,

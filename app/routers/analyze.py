@@ -1,4 +1,3 @@
-# app/routers/analyze.py
 from fastapi import APIRouter
 from app.logic import score_bonds, pick_best_and_alternatives
 from app.models import UserInput, AnalyzeResponse
