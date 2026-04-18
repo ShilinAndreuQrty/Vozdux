@@ -8,8 +8,11 @@ class Bond(BaseModel):
     price: float
     yield_percent: float
     risk: int
-    duration: int 
-    issuer_rating : int
+    duration: int
+    issuer_rating: int
+    coupon: float | None = None
+    yield_to_maturity: float | None = None
+
 
 #Ввод пользователя 
 class UserInput(BaseModel):
