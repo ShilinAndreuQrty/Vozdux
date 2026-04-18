@@ -43,14 +43,14 @@ df = json_to_dataframe(json_path='data/data.json')
 #exlanation
 values=[]
 for i in range(len(df['name'])):
-    values.append(i)
+    values.append(float(i))
 df['rating']= values
 po=pd.Series(df.iloc[0,:])
 result=po
 
 explanation = (
-        f"Выбрана облигация {df.get('name','')} ({df.get('ticker','')}) с рейтингом {df.get('rating'):.4f}. "
-        f"Доходность {df.get('yield_percent')}%, риск {df.get('risk')}, сроком на {df.get('duration')} мес."
+        f"Выбрана облигация {po.get('name','')} ({po.get('ticker','')}) с рейтингом {po.get('rating'):.4f}. "
+        f"Доходность {po.get('yield_percent')}%, риск {po.get('risk')}, сроком на {po.get('duration')} мес."
 )
 print(explanation)
-pd.to_json()
+#pd.to_json()
