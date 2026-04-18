@@ -327,7 +327,11 @@
       </div>
     </div>
     <div class="stat-box">
-      <h3 style="font-size: 1.5rem; margin-bottom: 20px;"><i data-feather="trending-up"></i> Топ-5 по доходности</h3>
+      <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom: 20px;">
+        <button type="button" onclick="switchTopMode(-1)" style="background:transparent; border:1px solid var(--border); color:var(--text-main); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:1.1rem;">&#8592;</button>
+        <h3 id="top5Title" style="font-size: 1.5rem; margin: 0;"><i data-feather="trending-up"></i> Топ-5 по доходности</h3>
+        <button type="button" onclick="switchTopMode(1)" style="background:transparent; border:1px solid var(--border); color:var(--text-main); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:1.1rem;">&#8594;</button>
+      </div>
       <div id="top5List" class="top-list"></div>
     </div>
   </div>
@@ -374,29 +378,48 @@ async function fetchAnalysis(amount, risk, duration) {
   }
 }
 
+const topModes = [
+  { key: 'yield', title: 'Топ-5 по доходности', valueLabel: 'Доходность', formatter: (item) => `${item.yield_percent ?? 'н/д'}%` },
+  { key: 'issuer', title: 'Топ-5 по рейтингу эмитента', valueLabel: 'Рейтинг', formatter: (item) => item.issuer_rating ?? item.issuer ?? 'н/д' },
+  { key: 'duration', title: 'Топ-5 по модифицированной дюрации', valueLabel: 'Дюрация', formatter: (item) => item.modified_duration ?? item.duration ?? 'н/д' }
+];
+let topModeIndex = 0;
+
+function updateTop5Title() {
+  const titleEl = document.getElementById('top5Title');
+  if (!titleEl) return;
+  titleEl.innerHTML = `<i data-feather="trending-up"></i> ${topModes[topModeIndex].title}`;
+}
+
+function switchTopMode(direction) {
+  topModeIndex = (topModeIndex + direction + topModes.length) % topModes.length;
+  updateTop5Title();
+  loadTop5();
+  feather.replace();
+}
+
 // Запрос списка для аналитики (Топ-5)
 async function loadTop5() {
   const container = document.getElementById('top5List');
+  const mode = topModes[topModeIndex];
+  updateTop5Title();
   container.innerHTML = '<div style="color:var(--text-muted)">Загрузка данных с сервера...</div>';
   
   try {
-    const response = await fetch(`${API_BASE}/bonds/list`);
+    const response = await fetch(`${API_BASE}/top?by=${mode.key}`);
     if (!response.ok) throw new Error("Ошибка получения списка");
     
-    const bonds = await response.json();
-    
-    // Сортируем по доходности и берем топ-5
-    const top5 = bonds.sort((a, b) => b.yield_percent - a.yield_percent).slice(0, 5);
+    const top5 = await response.json();
     
     container.innerHTML = top5.map(b => `
       <div class="top-item">
         <span>${b.name} <small style="color:var(--text-muted); font-size:0.8em; margin-left:8px">${b.ticker}</small></span>
-        <span style="color: var(--primary); font-weight: 900; font-size: 1.3rem;">${b.yield_percent}%</span>
+        <span style="color: var(--primary); font-weight: 900; font-size: 1.1rem;">${mode.formatter(b)}</span>
       </div>
     `).join('');
   } catch (error) {
-    console.error("Ошибка /bonds/list:", error);
-    container.innerHTML = '<div style="color:#ff4444">Не удалось загрузить данные с бэкенда</div>';
+    console.error("Ошибка /top:", error);
+    container.innerHTML = '<div style="color:#ff4444">Не удалось загрузить данные топа с бэкенда</div>';
   }
 }
 
