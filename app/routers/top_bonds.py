@@ -26,26 +26,23 @@ def top_bonds(by: str = Query("yield", enum=["yield", "issuer", "duration"])):
 
     # Дюрация 
     elif by == "duration":
-        # создаём numpy-массив всех облигаций
-        
         arr = np.array([
-        [
-            0,
-            0,
-            b["duration"],       # arr[:,2]
-            0,
-            b["yield_percent"]   # arr[:,4]
-        ]
-        for b in bonds
-    ])
+            [
+                0,
+                0,
+                b["duration"],       # arr[:,2]
+                0,
+                b["yield_percent"]   # arr[:,4]
+            ]
+            for b in bonds
+        ])
 
-    durations = calculate_bond_duration(arr)
+        durations = calculate_bond_duration(arr)
 
-    for i, bond in enumerate(bonds):
-        bond["duration_metric"] = float(durations[i])
+        for i, bond in enumerate(bonds):
+            bond["duration_metric"] = float(durations[i])
 
-    sorted_bonds = sorted(bonds, key=lambda x: x["duration_metric"])
-
+        sorted_bonds = sorted(bonds, key=lambda x: x["duration_metric"])
 
     return {
         "top_list": sorted_bonds[:5],
