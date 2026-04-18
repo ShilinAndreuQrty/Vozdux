@@ -471,7 +471,7 @@ document.getElementById('bondForm').addEventListener('submit', async function(e)
     exDiv.className = 'bond-card visible';
     exDiv.style.gridColumn = '1 / -1';
     exDiv.style.background = 'rgba(0, 230, 195, 0.05)';
-    exDiv.innerHTML = `<h3 style="color:var(--primary); margin-bottom: 10px;"><i data-feather="cpu"></i> Вердикт алгоритма</h3><p style="font-size: 1.1rem; color: var(--text-main);">${apiData.explanation}</p>`;
+    exDiv.innerHTML = `<h3 style="color:var(--primary); margin-bottom: 10px;"><i data-feather="cpu"></i> Вердикт алгоритма</h3><p style="font-size: 1.1rem; color: var(--text-main); white-space: pre-line;">${apiData.explanation}</p>`;
     container.appendChild(exDiv);
   }
 

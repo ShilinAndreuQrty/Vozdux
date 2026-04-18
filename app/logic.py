@@ -90,8 +90,11 @@ def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tupl
 
     # Простое объяснение: почему выбрали лучшую (можно расширить)
     explanation = (
-        f"Выбрана облигация {best.get('name','')} ({best.get('ticker','')}) с рейтингом {best.get('rating'):.4f}. "
-        f"Доходность {best.get('yield_percent')}%, риск {best.get('risk')}, сроком на {best.get('duration')} мес."
+        f"Выбрана облигация {best.get('name','')} с рейтингом {best.get('rating'):.4f}.\n"
+        f"Доходность: {best.get('yield_percent')}%.\n"
+        f"Риск: {best.get('risk')}.\n"
+        f"Срок: {best.get('duration')} мес.\n"
+        f"Рейтинг эмитента: {best.get('issuer_rating', 'н/д')}."
     )
 
     return best, alternatives, explanation
