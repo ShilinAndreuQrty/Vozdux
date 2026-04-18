@@ -16,11 +16,13 @@ def calculate_bond_rating_array(
     k3 = 0.05
     k4 = 0.25
     k5 = 0.35
+    k6 = 0.04 # штраф за рейтинг эмитента
 
     yield_percent = arr[:, 0]
     risk = arr[:, 1]
     duration_months = arr[:, 2]
     price = arr[:, 3]
+    issuer_rating = arr[:, 4]
 
     normalized_yield = yield_percent / 100.0
     risk_penalty = k1 * (risk ** 2)
@@ -29,11 +31,14 @@ def calculate_bond_rating_array(
     risk_distance = np.abs(risk - target_risk) / 3.0
     duration_distance = np.abs(duration_months - target_duration) / max(target_duration, 6.0)
 
+    issuer_penalty = k6 * (issuer_rating ** 2)
+
     rating = (
         (normalized_yield * (1 - risk_penalty) * (1 - duration_penalty))
         + (k3 * discount)
         - (k4 * risk_distance)
         - (k5 * duration_distance)
+        - issuer_penalty
     )
     return rating
 
@@ -57,7 +62,8 @@ def score_bonds(
         r = float(b.get("risk", 0.0))
         d = float(b.get("duration", 0.0))
         p = float(b.get("price", 100.0))
-        arr.append([yp, r, d, p])
+        ir = float(b.get("issuer_rating", 1))
+        arr.append([yp, r, d, p, ir])
 
     np_arr = np.array(arr, dtype=float)
     ratings = calculate_bond_rating_array(

@@ -9,6 +9,7 @@ class Bond(BaseModel):
     yield_percent: float
     risk: int
     duration: int 
+    issuer_rating : int
 
 #Ввод пользователя 
 class UserInput(BaseModel):
