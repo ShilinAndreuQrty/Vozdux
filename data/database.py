@@ -1,6 +1,21 @@
 import pandas as pd
-import numpy as np
+import numpy as np  
 import json
+
+# Функция для дюрации
+def calculate_bond_duration(arr):
+    yield_percent = arr[:, 4]
+    maturity_months = arr[:, 2]
+    
+    macaulay_duration_months = maturity_months
+    macaulay_duration_years = maturity_months / 12
+
+    # Модифицированная дюрация
+    modified_duration = macaulay_duration_years / (1 + yield_percent / 100)
+    # Изменение цены при изменении доходности на 1 %
+    price_change_percent = modified_duration * 100
+
+    return price_change_percent
 
 def json_to_dataframe(json_path=None, json_data=None):
     """
@@ -57,9 +72,11 @@ top_df=pd.DataFrame({
 })
 # Создаём top_df на основе df
 top_df = df[['name', 'ticker', 'duration']].copy()
+top_df['top_duration']=calculate_bond_duration(df.values)
+print(top_df)
 # Добавляем столбцы для рангов и заполняем их
-novie = ['top_price', 'top_yield_percent', 'top_risk', 'top_rating']
-starie = ['price', 'yield_percent', 'risk', 'rating']
+novie = ['top_price', 'top_yield_percent', 'top_rating']
+starie = ['price', 'yield_percent', 'rating']
 top_df[novie] = df[starie].rank()
 
 # Выбор строчки с информацией и вывод текста
@@ -68,8 +85,8 @@ ap=names[2] # число - индекс имени, в списке прошло
 cher2=(df[df['name']==ap]).index[0]
 po=pd.Series(df.loc[cher2,:])
 explanation = (
-        f"Выбрана облигация {po.get('name','')} ({po.get('ticker','')}) с рейтингом {po.get('top_rating'):.4f}. "
-        f"Доходность {po.get('top_yield_percent')}%, риск {po.get('top_risk')}, сроком на {po.get('duration')} мес.\n"
+        f"Выбрана облигация {po.get('name','')} ({po.get('ticker','')}) с рейтингом {po.get('rating'):.4f}. "
+        f"Доходность {po.get('yield_percent')}%, риск {po.get('risk')}, сроком на {po.get('duration')} мес.\n"
         "Наивысшее соотношение между доходностью, риском и сроком\n"
 )
 
@@ -83,7 +100,7 @@ example_rating=(
     "Рейтинг по критериям:\n"
     f"  - По рейтингу: {ex_r.get('top_rating'):.4f}. \n"
     f"  - По доходности: {ex_r.get('top_yield_percent')}\n"
-    f"  - По риску: {ex_r.get('top_risk')}\n"
+    f"  - По дюрации: {ex_r.get('top_duration')}\n"
 )
 #### Конец
 
