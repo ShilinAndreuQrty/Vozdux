@@ -2,14 +2,20 @@
 import numpy as np
 from typing import List, Dict, Tuple
 
-def calculate_bond_rating_array(arr: np.ndarray) -> np.ndarray:
+def calculate_bond_rating_array(
+    arr: np.ndarray,
+    target_risk: float,
+    target_duration: float
+) -> np.ndarray:
     """
     Векторная версия рейтинга (использует numpy array).
     arr columns: [yield_percent, risk, duration_months, price]
     """
     k1 = 0.05
-    k2 = 0.02
-    k3 = 0.1
+    k2 = 0.03
+    k3 = 0.05
+    k4 = 0.25
+    k5 = 0.35
 
     yield_percent = arr[:, 0]
     risk = arr[:, 1]
@@ -19,12 +25,23 @@ def calculate_bond_rating_array(arr: np.ndarray) -> np.ndarray:
     normalized_yield = yield_percent / 100.0
     risk_penalty = k1 * (risk ** 2)
     duration_penalty = k2 * ((duration_months / 36.0) ** 2)
-    discount = (1000.0 - price) / 1000.0
+    discount = (100.0 - price) / 100.0
+    risk_distance = np.abs(risk - target_risk) / 3.0
+    duration_distance = np.abs(duration_months - target_duration) / max(target_duration, 6.0)
 
-    rating = (normalized_yield * (1 - risk_penalty) * (1 - duration_penalty)) + (k3 * discount)
+    rating = (
+        (normalized_yield * (1 - risk_penalty) * (1 - duration_penalty))
+        + (k3 * discount)
+        - (k4 * risk_distance)
+        - (k5 * duration_distance)
+    )
     return rating
 
-def score_bonds(bonds: List[Dict]) -> List[Dict]:
+def score_bonds(
+    bonds: List[Dict],
+    target_risk: int,
+    target_duration: int
+) -> List[Dict]:
     """
     Принимает список облигаций (каждый — dict с полями: ticker,name,price,yield_percent,risk,duration)
     Возвращает тот же список с добавленным полем 'rating' (float).
@@ -39,11 +56,15 @@ def score_bonds(bonds: List[Dict]) -> List[Dict]:
         yp = float(b.get("yield_percent", 0.0))
         r = float(b.get("risk", 0.0))
         d = float(b.get("duration", 0.0))
-        p = float(b.get("price", 1000.0))
+        p = float(b.get("price", 100.0))
         arr.append([yp, r, d, p])
 
     np_arr = np.array(arr, dtype=float)
-    ratings = calculate_bond_rating_array(np_arr)
+    ratings = calculate_bond_rating_array(
+        np_arr,
+        target_risk=float(target_risk),
+        target_duration=float(target_duration)
+    )
 
     # Присваиваем рейтинги обратно
     out = []
