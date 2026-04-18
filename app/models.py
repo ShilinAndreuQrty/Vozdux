@@ -24,8 +24,12 @@ class Projection(BaseModel):
     estimated_annual_income: float
 
 
+class Explanation(BaseModel):
+    short: str
+    full: str
+
 class AnalyzeResponse(BaseModel):
-    best_bond: Optional[Bond]
+    best_bond: Bond
     alternatives: List[Bond]
-    explanation: str
-    projection: Optional[Projection] = None
+    explanation: Explanation
+    projection: Optional[dict]

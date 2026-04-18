@@ -90,7 +90,7 @@ def score_bonds(
 
 def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tuple[Dict, List[Dict], Dict[str, str]]:
     """
-    Возвращает: best_bond, alternatives (список), explanation (строка)
+    Возвращает: best_bond, alternatives (список), explanation (dict(строка, строка))
     """
     if not scored_bonds:
         return None, [], "Нет данных для анализа"
