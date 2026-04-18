@@ -3,203 +3,580 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BondSelect Pro — Умный подбор облигаций</title>
+  <title>BondSelect Pro — Инвестиционный Аналитик</title>
   <script src="https://unpkg.com/feather-icons"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #00e6c3; --primary-dark: #00b89c; --bg: #0b1120;
-      --card-bg: rgba(18, 30, 45, 0.85); --text-main: #f0f9ff;
-      --text-muted: #94a3b8; --border: #1e2b3c; --radius-lg: 24px;
+      --primary: #00e6c3;
+      --primary-dark: #00b89c;
+      --accent: #3b82f6;
+      --bg: #050914;
+      --card-bg: rgba(15, 23, 42, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.12);
+      --radius-lg: 32px;
+      --radius-md: 24px;
+      --shadow-glow: 0 20px 40px -12px rgba(0, 230, 195, 0.25);
+      --transition-smooth: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); padding: 20px; }
-    .container { max-width: 1100px; margin: 0 auto; }
-    .app-nav { display: flex; justify-content: space-between; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-    .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-    .filter-section { background: var(--card-bg); padding: 25px; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 30px; }
-    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-    .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
-    input, select { width: 100%; background: #0e1a26; border: 1.5px solid var(--border); color: white; padding: 12px; border-radius: 12px; outline: none; }
-    .btn { background: var(--primary); border: none; padding: 15px; border-radius: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 20px; transition: 0.3s; }
-    .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
-    .results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-    .bond-card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 1px solid var(--border); transition: 0.3s; }
-    .bond-card:hover { border-color: var(--primary); }
-    .badge { background: rgba(0, 230, 195, 0.1); color: var(--primary); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
-    .bond-name { font-size: 1.2rem; font-weight: 700; margin: 10px 0; }
-    .yield-big { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .yield-number { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
-    .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-muted); }
-    .detail-row strong { color: white; }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body { height: 100%; margin: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Анимированный фон */
+    .wave-bg {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: -1;
+      background: radial-gradient(circle at 50% -20%, #1e293b, #050914);
+      overflow: hidden;
+    }
+    .wave {
+      position: absolute;
+      bottom: 0; left: 0; width: 200%; height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="%2300e6c3" fill-opacity="0.05" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+      background-size: 50% 100%;
+      animation: waveMove 25s linear infinite;
+    }
+    @keyframes waveMove { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    .container { max-width: 1400px; margin: 0 auto; padding: 40px 30px; position: relative; z-index: 1; flex: 1; width: 100%; }
+
+    /* Навигация */
+    .app-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 60px; padding: 15px 30px;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(25px);
+      border-radius: 60px;
+      border: 1px solid var(--glass-border);
+    }
+    .logo { display: flex; align-items: center; gap: 15px; font-weight: 800; font-size: 1.7rem; }
+    .logo-icon {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      width: 45px; height: 45px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; color: #050914;
+    }
+    .nav-tabs { display: flex; gap: 12px; }
+    .nav-link {
+      padding: 12px 28px; border-radius: 35px; font-weight: 600; color: var(--text-muted);
+      text-decoration: none; transition: 0.3s; display: flex; align-items: center; gap: 10px;
+    }
+    .nav-link.active { background: var(--primary); color: #050914; box-shadow: 0 8px 20px rgba(0, 230, 195, 0.3); }
+
+    /* Стратегии */
+    .strategy-menu {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px; margin-bottom: 50px;
+    }
+    .strategy-card {
+      background: var(--card-bg); border: 1px solid var(--glass-border);
+      padding: 35px; border-radius: var(--radius-md); cursor: pointer;
+      transition: var(--transition-smooth); text-align: center;
+    }
+    .strategy-card:hover { transform: translateY(-10px); border-color: var(--primary); background: rgba(0, 230, 195, 0.05); }
+    .strategy-card.active { border-color: var(--primary); background: rgba(0, 230, 195, 0.12); box-shadow: var(--shadow-glow); }
+    .strategy-card i { margin-bottom: 20px; color: var(--primary); width: 32px; height: 32px; }
+    .strategy-card h4 { font-size: 1.3rem; margin-bottom: 10px; }
+
+    /* Форма */
+    .form-section {
+      background: var(--card-bg); backdrop-filter: blur(25px);
+      padding: 50px; border-radius: var(--radius-lg);
+      border: 1px solid var(--glass-border); margin-bottom: 70px;
+      position: relative;
+      z-index: 10;
+    }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
+    @media (min-width: 768px) { .form-grid { grid-template-columns: 1fr 1fr; align-items: end; } }
+    
+    .form-group { display: flex; flex-direction: column; gap: 15px; position: relative; }
+    label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
+    
+    input {
+      background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); color: white;
+      padding: 20px; border-radius: 20px; font-size: 1.1rem; outline: none; transition: 0.3s;
+    }
+    input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 230, 195, 0.1); }
+
+    /* Кастомный селект */
+    .custom-select {
+      position: relative;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .select-trigger {
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1rem;
+    }
+    .select-options {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      right: 0;
+      background: #0b1120;
+      border: 1px solid var(--primary);
+      border-radius: 20px;
+      overflow: hidden;
+      display: none;
+      z-index: 1001;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      backdrop-filter: blur(30px);
+    }
+    .select-options.show { display: block; animation: selectFade 0.3s ease; }
+    @keyframes selectFade { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .option { padding: 18px 20px; transition: 0.2s; font-size: 1rem; }
+    .option:hover { background: var(--primary); color: #050914; font-weight: 600; }
+
+    .btn-main {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #050914; border: none; padding: 25px; border-radius: 22px;
+      font-weight: 800; font-size: 1.3rem; cursor: pointer; transition: var(--transition-smooth);
+      grid-column: 1 / -1; width: 100%; margin-top: 10px;
+      box-shadow: 0 15px 30px -10px rgba(0, 230, 195, 0.4);
+    }
+    .btn-main:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 20px 40px -10px rgba(0, 230, 195, 0.6); }
+
+    /* Результаты */
+    .results-grid { display: grid; grid-template-columns: 1fr; gap: 35px; }
+    @media (min-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1200px) { .results-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .bond-card {
+      background: var(--card-bg); backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg); padding: 40px; border: 1px solid var(--glass-border);
+      transition: var(--transition-smooth); cursor: pointer;
+      opacity: 0; transform: translateY(30px);
+    }
+    .bond-card.visible { opacity: 1; transform: translateY(0); }
+    .bond-card:hover { border-color: var(--primary); transform: translateY(-12px); box-shadow: var(--shadow-glow); }
+    
+    .bond-name { font-size: 1.6rem; font-weight: 800; margin-bottom: 20px; color: white; }
+    .yield-display {
+      background: rgba(0, 0, 0, 0.4); padding: 25px; border-radius: 20px;
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .yield-val { font-size: 2.2rem; font-weight: 900; color: var(--primary); }
+
+    .bond-details {
+      max-height: 0; overflow: hidden; transition: max-height 0.6s ease-out;
+      font-size: 1rem; color: var(--text-muted); border-top: 0px solid var(--border); margin-top: 0;
+    }
+    .bond-card.expanded .bond-details {
+      max-height: 300px; margin-top: 25px; padding-top: 25px; border-top-width: 1px;
+    }
+
+    /* Аналитика */
+    .stats-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 50px; }
+    @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    
+    .stat-box {
+      background: var(--card-bg); padding: 50px; border-radius: var(--radius-lg);
+      border: 1px solid var(--glass-border); text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    }
+    .chart-container { position: relative; width: 250px; height: 250px; margin: 0 auto 30px; }
+    .chart-svg { transform: rotate(90deg) scaleX(-1); width: 250px; height: 250px; }
+    .chart-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 15; }
+    .chart-fill {
+      fill: none; stroke: var(--primary); stroke-width: 15; stroke-linecap: round;
+      stroke-dasharray: 753.98; stroke-dashoffset: 753.98;
+      transition: none; /* Убираем transition для мгновенного сброса */
+    }
+    .chart-fill.animate {
+      transition: stroke-dashoffset 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .chart-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      font-size: 2rem; font-weight: 900; color: white;
+    }
+
+    .top-list { margin-top: 40px; text-align: left; }
+    .top-item {
+      display: flex; justify-content: space-between; padding: 18px 0;
+      border-bottom: 1px solid var(--border); font-size: 1.1rem;
+    }
+    .top-item:last-child { border-bottom: none; }
+
+    .page { display: none; }
+    .page.active { display: block; animation: pageIn 0.6s ease; }
+    @keyframes pageIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+    footer { text-align: center; padding: 80px 0; color: var(--text-muted); font-size: 1rem; border-top: 1px solid var(--border); margin-top: 80px; }
   </style>
 </head>
 <body>
-<div class="container">
-  <div class="app-nav">
-    <div class="logo">BONDSELECT</div>
-    <div style="color: var(--text-muted)">Hackathon Edition</div>
-  </div>
 
-  <div class="filter-section">
-    <div class="filter-grid">
-      <div class="form-group">
-        <label>Сумма инвестиций (₽)</label>
-        <input type="number" id="amount" value="50000">
+<div class="wave-bg"><div class="wave"></div></div>
+
+<div class="container">
+  <nav class="app-nav">
+    <div class="logo"><div class="logo-icon">B</div><span>BondSelect Pro</span></div>
+    <div class="nav-tabs">
+      <a href="#" class="nav-link active" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
+      <a href="#" class="nav-link" onclick="switchPage('analytics', event)"><i data-feather="pie-chart"></i> Аналитика</a>
+    </div>
+  </nav>
+
+  <div id="page-select" class="page active">
+    <div class="strategy-menu">
+      <div class="strategy-card active" onclick="applyStrategy('safe', this)">
+        <i data-feather="shield"></i>
+        <h4>Консерватор</h4>
+        <p>Максимальная защита капитала</p>
       </div>
-      <div class="form-group">
-        <label>Срок (месяцев)</label>
-        <select id="duration">
-          <option value="3">3 месяца</option>
-          <option value="6">6 месяцев</option>
-          <option value="12" selected>1 год (12 мес.)</option>
-          <option value="24">2 года (24 мес.)</option>
-        </select>
+      <div class="strategy-card" onclick="applyStrategy('balanced', this)">
+        <i data-feather="activity"></i>
+        <h4>Баланс</h4>
+        <p>Оптимальное соотношение риска и доходности</p>
       </div>
-      <div class="form-group">
-        <label>Уровень риска</label>
-        <select id="risk">
-          <option value="low">Низкий (ОФЗ)</option>
-          <option value="medium">Средний (A-AA)</option>
-          <option value="high">Высокий (BBB+)</option>
-        </select>
+      <div class="strategy-card" onclick="applyStrategy('aggressive', this)">
+        <i data-feather="zap"></i>
+        <h4>Агрессивный</h4>
+        <p>Максимальный рост купонного дохода</p>
       </div>
     </div>
-    <button class="btn" id="applyFilterBtn">НАЙТИ ОБЛИГАЦИИ</button>
+
+    <section class="form-section">
+      <form id="bondForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label><i data-feather="credit-card"></i> Сумма инвестиций (₽)</label>
+            <input type="number" id="amount" value="100000" min="1000">
+          </div>
+          <div class="form-group">
+            <label><i data-feather="calendar"></i> Горизонт планирования</label>
+            <div class="custom-select" id="termSelect">
+              <div class="select-trigger"><span>12 месяцев</span> <i data-feather="chevron-down"></i></div>
+              <div class="select-options">
+                <div class="option" data-value="6">6 месяцев</div>
+                <div class="option" data-value="12">12 месяцев</div>
+                <div class="option" data-value="24">24 месяца</div>
+                <div class="option" data-value="36">36 месяцев</div>
+              </div>
+            </div>
+            <input type="hidden" id="term" value="12">
+          </div>
+          <button type="submit" class="btn-main">Найти лучшие предложения</button>
+        </div>
+      </form>
+    </section>
+
+    <div id="results" class="results-grid"></div>
   </div>
 
-  <div id="resultsContainer" class="results-grid"></div>
+  <div id="page-analytics" class="page">
+    <div class="stats-grid">
+      <div class="stat-box">
+        <h3><i data-feather="layers"></i> Структура портфеля</h3>
+        <div class="chart-container">
+          <svg class="chart-svg" viewBox="0 0 250 250">
+            <circle class="chart-bg" cx="125" cy="125" r="120"></circle>
+            <circle id="chartType" class="chart-fill" cx="125" cy="125" r="120"></circle>
+          </svg>
+          <div class="chart-text" id="typeVal">0%</div>
+        </div>
+        <p style="font-size: 1.1rem;">Доля защитных активов в выборке</p>
+      </div>
+      <div class="stat-box">
+        <h3><i data-feather="award"></i> Средняя доходность</h3>
+        <div class="chart-container">
+          <svg class="chart-svg" viewBox="0 0 250 250">
+            <circle class="chart-bg" cx="125" cy="125" r="120"></circle>
+            <circle id="chartYield" class="chart-fill" cx="125" cy="125" r="120" style="stroke: var(--accent);"></circle>
+          </svg>
+          <div class="chart-text" id="yieldVal">0%</div>
+        </div>
+        <p style="font-size: 1.1rem;">Ожидаемая годовая прибыль</p>
+      </div>
+    </div>
+    <div class="stat-box">
+      <h3 style="font-size: 1.5rem; margin-bottom: 20px;"><i data-feather="trending-up"></i> Топ-5 по доходности</h3>
+      <div id="top5List" class="top-list"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 BondSelect Pro. Информация носит ознакомительный характер и не является инвестиционной рекомендацией.</p>
+  </footer>
 </div>
 
 <script>
-(function() {
-    feather.replace();
+// --- 1. НАСТРОЙКИ API ---
+const API_BASE = "http://95.181.174.86:8000";
 
-    // ТОЧНЫЙ АДРЕС: префикс /analyze + роутер /
-    const API_URL = "http://127.0.0.1:8000/analyze/";
-    
-    let currentTerm = 12;
-    let currentRisk = 'low';
-    const riskMapping = { 'low': 1, 'medium': 2, 'high': 3 };
+// Перевод рисков для интерфейса
+const riskTranslation = {
+  1: "Низкий (ОФЗ/Надежные)",
+  2: "Средний (Корпоративные А-АА)",
+  3: "Высокий (ВВВ+ и ниже)"
+};
 
-    async function fetchBondsData(amount, riskStr, termMonths) {
-        const payload = {
-            amount: parseFloat(amount),
-            risk: riskMapping[riskStr],
-            duration: parseInt(termMonths)
-        };
+// Соответствие карточек стратегий числовому риску для бэкенда
+const strategyToRisk = {
+  'консерватор': 1,
+  'баланс': 2,
+  'агрессивный': 3
+};
 
-        console.log("Отправка JSON:", payload);
+// --- 2. ВЗАИМОДЕЙСТВИЕ С БЭКЕНДОМ ---
 
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) throw new Error('Ошибка: ' + response.status);
-            return await response.json();
-        } catch (error) {
-            console.error("Ошибка подключения к бэкенду:", error);
-            return null;
-        }
-    }
-
-    async function applyAndRender() {
-        const amtInput = document.getElementById('amount');
-        const amount = parseInt(amtInput.value) || 50000;
-        const container = document.getElementById('resultsContainer');
-        
-        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #00e6c3;">Связь с сервером...</div>';
-
-        const apiData = await fetchBondsData(amount, currentRisk, currentTerm);
-
-        container.innerHTML = ''; 
-
-        if (!apiData) {
-            container.innerHTML = `
-                <div style="grid-column: 1/-1; color: #ff4444; text-align:center; padding: 20px; border: 1px solid #ff4444; border-radius: 15px;">
-                    Сервер Никиты не отвечает. <br>
-                    Убедись, что запущен uvicorn и адрес "${API_URL}" верен.
-                </div>`;
-            return;
-        }
-
-        // Вывод объяснения (сейчас там: "Дмитрий Пономарёв лох")
-        if (apiData.explanation) {
-            const exDiv = document.createElement('div');
-            exDiv.className = 'bond-card';
-            exDiv.style.gridColumn = '1 / -1';
-            exDiv.innerHTML = `<h3>Вердикт системы</h3><p>${apiData.explanation}</p>`;
-            container.appendChild(exDiv);
-        }
-
-        // Рендерим лучшую облигацию (поле "best")
-        if (apiData.best) {
-            container.appendChild(createBondCard(apiData.best, true));
-        } else if (!apiData.alternatives || apiData.alternatives.length === 0) {
-            const emptyDiv = document.createElement('div');
-            emptyDiv.style.gridColumn = '1 / -1';
-            emptyDiv.style.textAlign = 'center';
-            emptyDiv.innerHTML = '<p style="color: var(--text-muted)">Бэкенд пока не вернул подходящих облигаций.</p>';
-            container.appendChild(emptyDiv);
-        }
-
-        // Рендерим альтернативы
-        if (apiData.alternatives && Array.isArray(apiData.alternatives)) {
-            apiData.alternatives.forEach(b => container.appendChild(createBondCard(b, false)));
-        }
-        
-        feather.replace();
-    }
-
-    function createBondCard(bond, isBest) {
-        const card = document.createElement('div');
-        card.className = 'bond-card';
-        if (isBest) card.style.borderColor = 'var(--primary)';
-        
-        const rText = bond.risk === 1 ? 'Низкий' : (bond.risk === 2 ? 'Средний' : 'Высокий');
-        
-        card.innerHTML = `
-            <span class="badge">${isBest ? '★ Лучший выбор' : 'Альтернатива'}</span>
-            <div class="bond-name">${bond.name || 'Без названия'} <small>${bond.ticker || ''}</small></div>
-            <div class="yield-big"><span>Доходность</span><span class="yield-number">${bond.yield_percent || 0}%</span></div>
-            <div class="detail-row"><span>Цена</span><strong>${bond.price || 0} ₽</strong></div>
-            <div class="detail-row"><span>Риск</span><strong>${rText}</strong></div>
-            <div class="detail-row"><span>Срок</span><strong>${bond.duration || 0} мес.</strong></div>
-        `;
-        return card;
-    }
-
-    // Инициализация селекторов
-    document.querySelectorAll('.custom-select').forEach(select => {
-        const header = select.querySelector('.select-header');
-        header.addEventListener('click', (e) => {
-            e.stopPropagation();
-            select.classList.toggle('active');
-        });
-        
-        select.querySelectorAll('.select-option').forEach(opt => {
-            opt.addEventListener('click', () => {
-                if (select.id === 'termSelect') {
-                    currentTerm = parseInt(opt.dataset.value);
-                    document.getElementById('selectedTermText').innerText = opt.innerText;
-                } else {
-                    currentRisk = opt.dataset.value;
-                    document.getElementById('selectedRiskText').innerText = opt.innerText;
-                }
-                select.classList.remove('active');
-            });
-        });
+// Главный запрос анализа
+async function fetchAnalysis(amount, risk, duration) {
+  try {
+    const response = await fetch(`${API_BASE}/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, risk, duration })
     });
+    if (!response.ok) throw new Error("Ошибка сервера: " + response.status);
+    return await response.json();
+  } catch (error) {
+    console.error("Ошибка запроса /analyze:", error);
+    return null;
+  }
+}
 
-    document.getElementById('applyFilterBtn').addEventListener('click', applyAndRender);
+// Запрос списка для аналитики (Топ-5)
+async function loadTop5() {
+  const container = document.getElementById('top5List');
+  container.innerHTML = '<div style="color:var(--text-muted)">Загрузка данных с сервера...</div>';
+  
+  try {
+    const response = await fetch(`${API_BASE}/bonds/list`);
+    if (!response.ok) throw new Error("Ошибка получения списка");
+    
+    const bonds = await response.json();
+    
+    // Сортируем по доходности и берем топ-5
+    const top5 = bonds.sort((a, b) => b.yield_percent - a.yield_percent).slice(0, 5);
+    
+    container.innerHTML = top5.map(b => `
+      <div class="top-item">
+        <span>${b.name} <small style="color:var(--text-muted); font-size:0.8em; margin-left:8px">${b.ticker}</small></span>
+        <span style="color: var(--primary); font-weight: 900; font-size: 1.3rem;">${b.yield_percent}%</span>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error("Ошибка /bonds/list:", error);
+    container.innerHTML = '<div style="color:#ff4444">Не удалось загрузить данные с бэкенда</div>';
+  }
+}
 
-    // Первоначальный вызов
-    applyAndRender();
-})();
+// --- 3. UI ЛОГИКА ФРОНТЕНДА ---
+
+// Кастомный селект
+const termSelect = document.getElementById('termSelect');
+const termInput = document.getElementById('term');
+
+termSelect.addEventListener('click', (e) => {
+  e.stopPropagation();
+  termSelect.querySelector('.select-options').classList.toggle('show');
+});
+
+document.addEventListener('click', () => {
+  termSelect.querySelector('.select-options').classList.remove('show');
+});
+
+termSelect.querySelectorAll('.option').forEach(opt => {
+  opt.addEventListener('click', (e) => {
+    termInput.value = opt.dataset.value;
+    termSelect.querySelector('.select-trigger span').innerText = opt.innerText;
+    e.stopPropagation();
+    termSelect.querySelector('.select-options').classList.remove('show');
+  });
+});
+
+// Переключение страниц
+function switchPage(page, e) {
+  if(e) e.preventDefault();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  if(e) e.currentTarget.classList.add('active');
+  
+  if(page === 'analytics') {
+    resetCharts(); 
+    setTimeout(animateCharts, 100);
+    loadTop5(); // Запрашиваем реальный топ-5 у Никиты
+  }
+  feather.replace();
+}
+
+// Выбор стратегии
+function applyStrategy(type, el) {
+  document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const term = type === 'safe' ? '12' : (type === 'balanced' ? '12' : '24');
+  termInput.value = term;
+  termSelect.querySelector('.select-trigger span').innerText = term + ' месяцев';
+}
+
+// --- 4. ОТПРАВКА ФОРМЫ И РЕНДЕР ---
+
+document.getElementById('bondForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  // Собираем данные
+  const amount = parseInt(document.getElementById('amount').value) || 50000;
+  const term = parseInt(termInput.value) || 12;
+  const strategyText = document.querySelector('.strategy-card.active h4').innerText.toLowerCase();
+  const risk = strategyToRisk[strategyText] || 1; // Превращаем стратегию в 1, 2 или 3
+
+  const container = document.getElementById('results');
+  container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--primary); font-size: 1.2rem;"><i data-feather="loader" style="animation: spin 2s linear infinite;"></i> Связь с ИИ-аналитиком...</div>';
+  feather.replace();
+
+  // Идем на бэкенд
+  const apiData = await fetchAnalysis(amount, risk, term);
+
+  container.innerHTML = '';
+
+  if (!apiData) {
+    container.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; border-radius: 20px; background: rgba(255,68,68,0.1); border: 1px solid #ff4444; color: #ff4444; text-align: center;">Бэкенд недоступен. Проверьте, запущен ли сервер Никиты на 127.0.0.1:8000.</div>';
+    return;
+  }
+
+  // Рисуем вердикт системы, если есть
+  if (apiData.explanation) {
+    const exDiv = document.createElement('div');
+    exDiv.className = 'bond-card visible';
+    exDiv.style.gridColumn = '1 / -1';
+    exDiv.style.background = 'rgba(0, 230, 195, 0.05)';
+    exDiv.innerHTML = `<h3 style="color:var(--primary); margin-bottom: 10px;"><i data-feather="cpu"></i> Вердикт алгоритма</h3><p style="font-size: 1.1rem; color: var(--text-main);">${apiData.explanation}</p>`;
+    container.appendChild(exDiv);
+  }
+
+  // Рисуем лучшую облигацию
+  if (apiData.best_bond) {
+    container.appendChild(createRealCard(apiData.best_bond, true));
+  }
+
+  // Рисуем альтернативы
+  if (apiData.alternatives && apiData.alternatives.length > 0) {
+    apiData.alternatives.forEach(bond => {
+      container.appendChild(createRealCard(bond, false));
+    });
+  }
+  
+  feather.replace();
+});
+
+// Генерация карточки из реальных данных
+function createRealCard(bond, isBest) {
+  const card = document.createElement('div');
+  card.className = 'bond-card visible';
+  if (isBest) {
+    card.style.borderColor = 'var(--primary)';
+    card.style.boxShadow = 'var(--shadow-glow)';
+  }
+  
+  card.innerHTML = `
+    ${isBest ? '<div style="color:var(--primary); font-weight:800; font-size:0.8rem; letter-spacing:1px; margin-bottom:15px; text-transform:uppercase;">★ Лучший выбор</div>' : ''}
+    <div class="bond-name">${bond.name || 'Облигация'}</div>
+    <div class="yield-display">
+      <span style="font-size: 1rem; color: var(--text-muted);">Доходность</span>
+      <span class="yield-val">${bond.yield_percent}%</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 10px;">
+      <span style="color: var(--text-muted);">Тикер</span>
+      <span style="font-weight: 700; color: var(--text-main);">${bond.ticker}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 10px;">
+      <span style="color: var(--text-muted);">Цена</span>
+      <span style="font-weight: 700;">${bond.price} ₽</span>
+    </div>
+    <div class="bond-details">
+      <p style="margin-top: 15px;">Срок: ${bond.duration} мес.</p>
+      <p>Риск: ${riskTranslation[bond.risk] || 'Неизвестно'}</p>
+      <p style="margin-top: 15px; color: var(--primary);">Нажмите, чтобы скрыть детали</p>
+    </div>
+  `;
+  card.addEventListener('click', () => card.classList.toggle('expanded'));
+  return card;
+}
+
+// --- 5. АНИМАЦИИ ГРАФИКОВ (Без изменений) ---
+function resetCharts() {
+  const circleLength = 753.98;
+  const charts = ['chartType', 'chartYield'];
+  charts.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) { el.classList.remove('animate'); el.style.strokeDashoffset = circleLength; }
+  });
+  if(document.getElementById('typeVal')) document.getElementById('typeVal').innerText = '0%';
+  if(document.getElementById('yieldVal')) document.getElementById('yieldVal').innerText = '0%';
+}
+
+function animateCharts() {
+  const circleLength = 753.98;
+  
+  const typeEl = document.getElementById('chartType');
+  if(typeEl) {
+    const typePerc = 65;
+    typeEl.classList.add('animate');
+    typeEl.style.strokeDashoffset = circleLength - (circleLength * typePerc / 100);
+    animateValue('typeVal', 0, typePerc, '%');
+  }
+
+  const yieldEl = document.getElementById('chartYield');
+  if(yieldEl) {
+    const yieldPerc = 15.4;
+    yieldEl.classList.add('animate');
+    yieldEl.style.strokeDashoffset = circleLength - (circleLength * (yieldPerc * 4) / 100);
+    animateValue('yieldVal', 0, yieldPerc, '%');
+  }
+}
+
+function animateValue(id, start, end, suffix) {
+  let current = start;
+  const step = end / 50;
+  const el = document.getElementById(id);
+  if(!el) return;
+  const timer = setInterval(() => {
+    current += step;
+    if(current >= end) {
+      el.innerText = end + suffix;
+      clearInterval(timer);
+    } else {
+      el.innerText = current.toFixed(1) + suffix;
+    }
+  }, 30);
+}
+
+// Добавляем стиль для спиннера загрузки (вставляется в head автоматически)
+const style = document.createElement('style');
+style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+document.head.appendChild(style);
+
+// Инициализация при старте
+feather.replace();
 </script>
 </body>
 </html>
