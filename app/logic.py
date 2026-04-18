@@ -20,7 +20,8 @@ def calculate_bond_rating_array(arr: np.ndarray) -> np.ndarray:
     risk_penalty = k1 * (risk ** 2)
     duration_penalty = k2 * ((duration_months / 36.0) ** 2)
     discount = (1000.0 - price) / 1000.0
-
+#(1-risk*0,3)*duration*yield_percent
+#(yield_percent / 100.0)
     rating = (normalized_yield * (1 - risk_penalty) * (1 - duration_penalty)) + (k3 * discount)
     return rating
 

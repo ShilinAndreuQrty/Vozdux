@@ -52,7 +52,7 @@ top_df=pd.DataFrame({
     'dur':[],
     'top_price':[],
     'top_yield_percent':[],
-    'top_risk':[],
+    'top_duration':[],
     'top_rating':[]
 })
 # Создаём top_df на основе df
