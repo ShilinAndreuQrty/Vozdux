@@ -45,7 +45,7 @@ df['rating']= values
 #### Таблица 'топ', сравнение со всеми по параметрам
 # Смена порядка колонок
 df=df[['name','ticker','duration','price','yield_percent','risk','rating']]
-
+# Создание новой таблички
 top_df=pd.DataFrame({
     'name':[],
     'ticker':[],
@@ -55,36 +55,36 @@ top_df=pd.DataFrame({
     'top_risk':[],
     'top_rating':[]
 })
-
 # Создаём top_df на основе df
 top_df = df[['name', 'ticker', 'duration']].copy()
 # Добавляем столбцы для рангов и заполняем их
-starie = ['top_price', 'top_yield_percent', 'top_risk', 'top_rating']
-novie = ['price', 'yield_percent', 'risk', 'rating']
-top_df[starie] = df[novie].rank()
+novie = ['top_price', 'top_yield_percent', 'top_risk', 'top_rating']
+starie = ['price', 'yield_percent', 'risk', 'rating']
+top_df[novie] = df[starie].rank()
 
-#print(top_df)
-
-po=pd.Series(top_df.iloc[0,:])
+# Выбор строчки с информацией и вывод текста
+names=pd.Series(df['name'])
+ap=names[2] # число - индекс имени, в списке прошлом, просто для поиска
+cher2=(df[df['name']==ap]).index[0]
+po=pd.Series(df.loc[cher2,:])
 explanation = (
         f"Выбрана облигация {po.get('name','')} ({po.get('ticker','')}) с рейтингом {po.get('top_rating'):.4f}. "
         f"Доходность {po.get('top_yield_percent')}%, риск {po.get('top_risk')}, сроком на {po.get('duration')} мес.\n"
         "Наивысшее соотношение между доходностью, риском и сроком\n"
 )
-#вывод
+
+# Нахождение индекса нужной строчки по названию облигации и вывод текста с информацией из рейтинга: top_df
 names=pd.Series(top_df['name'])
-op=names[2]
-cher=(df[df['name']==op]).index[0]
+op=names[2] # число - индекс имени, в списке прошлом, просто для поиска
+cher=(top_df[top_df['name']==op]).index[0]
 ex_r=pd.Series(top_df.loc[cher,:])
 example_rating=(
     f"Выбрана облигация {ex_r.get('name','')} ({ex_r.get('ticker','')})\n"
     "Рейтинг по критериям:\n"
     f"  - По рейтингу: {ex_r.get('top_rating'):.4f}. \n"
-    f"  - По доходности: {ex_r.get('top_yield_percent')}%\n"
+    f"  - По доходности: {ex_r.get('top_yield_percent')}\n"
     f"  - По риску: {ex_r.get('top_risk')}\n"
 )
 #### Конец
 
 print(example_rating)
-#pd.to_json()
-
