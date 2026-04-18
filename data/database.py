@@ -43,7 +43,7 @@ for i in range(len(df['name'])):
 df['rating']= values
 
 #### Таблица 'топ', сравнение со всеми по параметрам
-
+# Смена порядка колонок
 df=df[['name','ticker','duration','price','yield_percent','risk','rating']]
 
 top_df=pd.DataFrame({
@@ -55,6 +55,7 @@ top_df=pd.DataFrame({
     'top_risk':[],
     'top_rating':[]
 })
+
 # Создаём top_df на основе df
 top_df = df[['name', 'ticker', 'duration']].copy()
 # Добавляем столбцы для рангов и заполняем их
@@ -72,10 +73,9 @@ explanation = (
 )
 #вывод
 names=pd.Series(top_df['name'])
-print(names)
 op=names[2]
-cher=df['name'].str.contains(op,case=False)
-ex_r=pd.Series(top_df.iloc[cher,:])
+cher=(df[df['name']==op]).index[0]
+ex_r=pd.Series(top_df.loc[cher,:])
 example_rating=(
     f"Выбрана облигация {ex_r.get('name','')} ({ex_r.get('ticker','')})\n"
     "Рейтинг по критериям:\n"
@@ -85,6 +85,6 @@ example_rating=(
 )
 #### Конец
 
-#print(example_rating)
+print(example_rating)
 #pd.to_json()
 
