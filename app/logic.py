@@ -40,6 +40,10 @@ def calculate_bond_rating_array(
         - (k5 * duration_distance)
         - issuer_penalty
     )
+    discount = (1000.0 - price) / 1000.0
+#(1-risk*0,3)*duration*yield_percent
+#(yield_percent / 100.0)
+    rating = (normalized_yield * (1 - risk_penalty) * (1 - duration_penalty)) + (k3 * discount)
     return rating
 
 def score_bonds(
