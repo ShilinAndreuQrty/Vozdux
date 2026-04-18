@@ -328,172 +328,255 @@
 </div>
 
 <script>
-  // Данные-заглушки (30 штук)
-  const bondsData = Array.from({ length: 30 }, (_, i) => ({
-    id: i + 1,
-    name: `Заглушка ${i + 1}`,
-    type: i % 3 === 0 ? "safe" : "corp",
-    rating: ["AAA", "AA+", "AA", "A-", "BBB"][i % 5],
-    maturity: [6, 12, 18, 24, 36][i % 5],
-    yield: (12 + Math.random() * 10).toFixed(1),
-    risk: i % 3 === 0 ? "low" : (i % 3 === 1 ? "medium" : "high")
-  }));
+// --- 1. НАСТРОЙКИ API ---
+const API_BASE = "http://127.0.0.1:8000";
 
-  // Перевод риска
-  const riskTranslation = {
-    low: "Низкий",
-    medium: "Средний",
-    high: "Высокий"
-  };
+// Перевод рисков для интерфейса
+const riskTranslation = {
+  1: "Низкий (ОФЗ/Надежные)",
+  2: "Средний (Корпоративные А-АА)",
+  3: "Высокий (ВВВ+ и ниже)"
+};
 
-  // Кастомный селект
-  const termSelect = document.getElementById('termSelect');
-  const termInput = document.getElementById('term');
-  termSelect.addEventListener('click', (e) => {
-    e.stopPropagation();
-    termSelect.querySelector('.select-options').classList.toggle('show');
-  });
+// Соответствие карточек стратегий числовому риску для бэкенда
+const strategyToRisk = {
+  'консерватор': 1,
+  'баланс': 2,
+  'агрессивный': 3
+};
+
+// --- 2. ВЗАИМОДЕЙСТВИЕ С БЭКЕНДОМ ---
+
+// Главный запрос анализа
+async function fetchAnalysis(amount, risk, duration) {
+  try {
+    const response = await fetch(`${API_BASE}/analyze`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, risk, duration })
+    });
+    if (!response.ok) throw new Error("Ошибка сервера: " + response.status);
+    return await response.json();
+  } catch (error) {
+    console.error("Ошибка запроса /analyze:", error);
+    return null;
+  }
+}
+
+// Запрос списка для аналитики (Топ-5)
+async function loadTop5() {
+  const container = document.getElementById('top5List');
+  container.innerHTML = '<div style="color:var(--text-muted)">Загрузка данных с сервера...</div>';
   
-  document.addEventListener('click', () => {
-    termSelect.querySelector('.select-options').classList.remove('show');
-  });
-
-  termSelect.querySelectorAll('.option').forEach(opt => {
-    opt.addEventListener('click', (e) => {
-      termInput.value = opt.dataset.value;
-      termSelect.querySelector('.select-trigger span').innerText = opt.innerText;
-      e.stopPropagation();
-      termSelect.querySelector('.select-options').classList.remove('show');
-    });
-  });
-
-  function switchPage(page, e) {
-    if(e) e.preventDefault();
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    document.getElementById(`page-${page}`).classList.add('active');
-    if(e) e.currentTarget.classList.add('active');
+  try {
+    const response = await fetch(`${API_BASE}/bonds/list`);
+    if (!response.ok) throw new Error("Ошибка получения списка");
     
-    if(page === 'analytics') {
-      resetCharts(); // Сброс перед анимацией
-      setTimeout(animateCharts, 100);
-      renderTop5();
-    }
-    feather.replace();
-  }
-
-  function applyStrategy(type, el) {
-    document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    const term = type === 'safe' ? '12' : (type === 'balanced' ? '12' : '24');
-    termInput.value = term;
-    termSelect.querySelector('.select-trigger span').innerText = term + ' месяцев';
-    document.getElementById('bondForm').dispatchEvent(new Event('submit'));
-  }
-
-  document.getElementById('bondForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const term = parseInt(termInput.value);
-    const strategy = document.querySelector('.strategy-card.active h4').innerText.toLowerCase();
+    const bonds = await response.json();
     
-    let filtered = bondsData.filter(b => {
-      if(strategy === 'консерватор') return b.risk === 'low';
-      if(strategy === 'баланс') return b.risk !== 'high';
-      return true;
-    });
-
-    filtered.sort((a, b) => Math.abs(a.maturity - term) - Math.abs(b.maturity - term) || b.yield - a.yield);
-    renderResults(filtered.slice(0, 12));
-  });
-
-  function renderResults(bonds) {
-    const container = document.getElementById('results');
-    container.innerHTML = '';
-    bonds.forEach((bond, i) => {
-      const card = document.createElement('div');
-      card.className = 'bond-card';
-      card.innerHTML = `
-        <div class="bond-name">${bond.name}</div>
-        <div class="yield-display">
-          <span style="font-size: 1rem; color: var(--text-muted);">Доходность</span>
-          <span class="yield-val">${bond.yield}%</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 1.1rem;">
-          <span style="color: var(--text-muted);">Рейтинг</span>
-          <span style="font-weight: 700;">${bond.rating}</span>
-        </div>
-        <div class="bond-details">
-          <p>Тип актива: ${bond.type === 'safe' ? 'Государственный' : 'Корпоративный'}</p>
-          <p>Срок до погашения: ${bond.maturity} мес.</p>
-          <p>Уровень риска: ${riskTranslation[bond.risk]}</p>
-          <p style="margin-top: 15px; color: var(--primary);">Нажмите, чтобы скрыть детали</p>
-        </div>
-      `;
-      card.addEventListener('click', () => card.classList.toggle('expanded'));
-      container.appendChild(card);
-      setTimeout(() => card.classList.add('visible'), i * 100);
-    });
-  }
-
-  function renderTop5() {
-    const top5 = [...bondsData].sort((a, b) => b.yield - a.yield).slice(0, 5);
-    const container = document.getElementById('top5List');
+    // Сортируем по доходности и берем топ-5
+    const top5 = bonds.sort((a, b) => b.yield_percent - a.yield_percent).slice(0, 5);
+    
     container.innerHTML = top5.map(b => `
       <div class="top-item">
-        <span>${b.name}</span>
-        <span style="color: var(--primary); font-weight: 900; font-size: 1.3rem;">${b.yield}%</span>
+        <span>${b.name} <small style="color:var(--text-muted); font-size:0.8em; margin-left:8px">${b.ticker}</small></span>
+        <span style="color: var(--primary); font-weight: 900; font-size: 1.3rem;">${b.yield_percent}%</span>
       </div>
     `).join('');
+  } catch (error) {
+    console.error("Ошибка /bonds/list:", error);
+    container.innerHTML = '<div style="color:#ff4444">Не удалось загрузить данные с бэкенда</div>';
+  }
+}
+
+// --- 3. UI ЛОГИКА ФРОНТЕНДА ---
+
+// Кастомный селект
+const termSelect = document.getElementById('termSelect');
+const termInput = document.getElementById('term');
+
+termSelect.addEventListener('click', (e) => {
+  e.stopPropagation();
+  termSelect.querySelector('.select-options').classList.toggle('show');
+});
+
+document.addEventListener('click', () => {
+  termSelect.querySelector('.select-options').classList.remove('show');
+});
+
+termSelect.querySelectorAll('.option').forEach(opt => {
+  opt.addEventListener('click', (e) => {
+    termInput.value = opt.dataset.value;
+    termSelect.querySelector('.select-trigger span').innerText = opt.innerText;
+    e.stopPropagation();
+    termSelect.querySelector('.select-options').classList.remove('show');
+  });
+});
+
+// Переключение страниц
+function switchPage(page, e) {
+  if(e) e.preventDefault();
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById(`page-${page}`).classList.add('active');
+  if(e) e.currentTarget.classList.add('active');
+  
+  if(page === 'analytics') {
+    resetCharts(); 
+    setTimeout(animateCharts, 100);
+    loadTop5(); // Запрашиваем реальный топ-5 у Никиты
+  }
+  feather.replace();
+}
+
+// Выбор стратегии
+function applyStrategy(type, el) {
+  document.querySelectorAll('.strategy-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const term = type === 'safe' ? '12' : (type === 'balanced' ? '12' : '24');
+  termInput.value = term;
+  termSelect.querySelector('.select-trigger span').innerText = term + ' месяцев';
+}
+
+// --- 4. ОТПРАВКА ФОРМЫ И РЕНДЕР ---
+
+document.getElementById('bondForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  // Собираем данные
+  const amount = parseInt(document.getElementById('amount').value) || 50000;
+  const term = parseInt(termInput.value) || 12;
+  const strategyText = document.querySelector('.strategy-card.active h4').innerText.toLowerCase();
+  const risk = strategyToRisk[strategyText] || 1; // Превращаем стратегию в 1, 2 или 3
+
+  const container = document.getElementById('results');
+  container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--primary); font-size: 1.2rem;"><i data-feather="loader" style="animation: spin 2s linear infinite;"></i> Связь с ИИ-аналитиком...</div>';
+  feather.replace();
+
+  // Идем на бэкенд
+  const apiData = await fetchAnalysis(amount, risk, term);
+
+  container.innerHTML = '';
+
+  if (!apiData) {
+    container.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; border-radius: 20px; background: rgba(255,68,68,0.1); border: 1px solid #ff4444; color: #ff4444; text-align: center;">Бэкенд недоступен. Проверьте, запущен ли сервер Никиты на 127.0.0.1:8000.</div>';
+    return;
   }
 
-  function resetCharts() {
-    const circleLength = 753.98;
-    const charts = ['chartType', 'chartYield'];
-    charts.forEach(id => {
-      const el = document.getElementById(id);
-      el.classList.remove('animate');
-      el.style.strokeDashoffset = circleLength;
+  // Рисуем вердикт системы, если есть
+  if (apiData.explanation) {
+    const exDiv = document.createElement('div');
+    exDiv.className = 'bond-card visible';
+    exDiv.style.gridColumn = '1 / -1';
+    exDiv.style.background = 'rgba(0, 230, 195, 0.05)';
+    exDiv.innerHTML = `<h3 style="color:var(--primary); margin-bottom: 10px;"><i data-feather="cpu"></i> Вердикт алгоритма</h3><p style="font-size: 1.1rem; color: var(--text-main);">${apiData.explanation}</p>`;
+    container.appendChild(exDiv);
+  }
+
+  // Рисуем лучшую облигацию
+  if (apiData.best_bond) {
+    container.appendChild(createRealCard(apiData.best_bond, true));
+  }
+
+  // Рисуем альтернативы
+  if (apiData.alternatives && apiData.alternatives.length > 0) {
+    apiData.alternatives.forEach(bond => {
+      container.appendChild(createRealCard(bond, false));
     });
-    document.getElementById('typeVal').innerText = '0%';
-    document.getElementById('yieldVal').innerText = '0%';
+  }
+  
+  feather.replace();
+});
+
+// Генерация карточки из реальных данных
+function createRealCard(bond, isBest) {
+  const card = document.createElement('div');
+  card.className = 'bond-card visible';
+  if (isBest) {
+    card.style.borderColor = 'var(--primary)';
+    card.style.boxShadow = 'var(--shadow-glow)';
+  }
+  
+  card.innerHTML = `
+    ${isBest ? '<div style="color:var(--primary); font-weight:800; font-size:0.8rem; letter-spacing:1px; margin-bottom:15px; text-transform:uppercase;">★ Лучший выбор</div>' : ''}
+    <div class="bond-name">${bond.name || 'Облигация'}</div>
+    <div class="yield-display">
+      <span style="font-size: 1rem; color: var(--text-muted);">Доходность</span>
+      <span class="yield-val">${bond.yield_percent}%</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 10px;">
+      <span style="color: var(--text-muted);">Тикер</span>
+      <span style="font-weight: 700; color: var(--text-main);">${bond.ticker}</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 10px;">
+      <span style="color: var(--text-muted);">Цена</span>
+      <span style="font-weight: 700;">${bond.price} ₽</span>
+    </div>
+    <div class="bond-details">
+      <p style="margin-top: 15px;">Срок: ${bond.duration} мес.</p>
+      <p>Риск: ${riskTranslation[bond.risk] || 'Неизвестно'}</p>
+      <p style="margin-top: 15px; color: var(--primary);">Нажмите, чтобы скрыть детали</p>
+    </div>
+  `;
+  card.addEventListener('click', () => card.classList.toggle('expanded'));
+  return card;
+}
+
+// --- 5. АНИМАЦИИ ГРАФИКОВ (Без изменений) ---
+function resetCharts() {
+  const circleLength = 753.98;
+  const charts = ['chartType', 'chartYield'];
+  charts.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) { el.classList.remove('animate'); el.style.strokeDashoffset = circleLength; }
+  });
+  if(document.getElementById('typeVal')) document.getElementById('typeVal').innerText = '0%';
+  if(document.getElementById('yieldVal')) document.getElementById('yieldVal').innerText = '0%';
+}
+
+function animateCharts() {
+  const circleLength = 753.98;
+  
+  const typeEl = document.getElementById('chartType');
+  if(typeEl) {
+    const typePerc = 65;
+    typeEl.classList.add('animate');
+    typeEl.style.strokeDashoffset = circleLength - (circleLength * typePerc / 100);
+    animateValue('typeVal', 0, typePerc, '%');
   }
 
-  function animateCharts() {
-    const circleLength = 753.98;
-    
-    // Анимация типа
-    const typePerc = 65;
-    const typeOffset = circleLength - (circleLength * typePerc / 100);
-    const typeEl = document.getElementById('chartType');
-    typeEl.classList.add('animate');
-    typeEl.style.strokeDashoffset = typeOffset;
-    animateValue('typeVal', 0, typePerc, '%');
-
-    // Анимация доходности
+  const yieldEl = document.getElementById('chartYield');
+  if(yieldEl) {
     const yieldPerc = 15.4;
-    const yieldOffset = circleLength - (circleLength * (yieldPerc * 4) / 100);
-    const yieldEl = document.getElementById('chartYield');
     yieldEl.classList.add('animate');
-    yieldEl.style.strokeDashoffset = yieldOffset;
+    yieldEl.style.strokeDashoffset = circleLength - (circleLength * (yieldPerc * 4) / 100);
     animateValue('yieldVal', 0, yieldPerc, '%');
   }
+}
 
-  function animateValue(id, start, end, suffix) {
-    let current = start;
-    const step = end / 50;
-    const timer = setInterval(() => {
-      current += step;
-      if(current >= end) {
-        document.getElementById(id).innerText = end + suffix;
-        clearInterval(timer);
-      } else {
-        document.getElementById(id).innerText = current.toFixed(1) + suffix;
-      }
-    }, 30);
-  }
+function animateValue(id, start, end, suffix) {
+  let current = start;
+  const step = end / 50;
+  const el = document.getElementById(id);
+  if(!el) return;
+  const timer = setInterval(() => {
+    current += step;
+    if(current >= end) {
+      el.innerText = end + suffix;
+      clearInterval(timer);
+    } else {
+      el.innerText = current.toFixed(1) + suffix;
+    }
+  }, 30);
+}
 
-  feather.replace();
-  document.getElementById('bondForm').dispatchEvent(new Event('submit'));
+// Добавляем стиль для спиннера загрузки (вставляется в head автоматически)
+const style = document.createElement('style');
+style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
+document.head.appendChild(style);
+
+// Инициализация при старте
+feather.replace();
 </script>
 </body>
 </html>
