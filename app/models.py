@@ -10,8 +10,8 @@ class Bond(BaseModel):
     risk: int
     duration: int
     issuer_rating: int
-    coupon: float | None = None
-    yield_to_maturity: float | None = None
+    coupon: Optional[float] = None
+    yield_to_maturity: Optional[float] = None
 
 
 #Ввод пользователя 
