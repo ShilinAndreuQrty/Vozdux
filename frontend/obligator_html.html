@@ -331,6 +331,7 @@
 // --- 1. НАСТРОЙКИ API ---
 const API_BASE = "http://127.0.0.1:8000";
 
+
 // Перевод рисков для интерфейса
 const riskTranslation = {
   1: "Низкий (ОФЗ/Надежные)",
@@ -425,6 +426,7 @@ function switchPage(page, e) {
     resetCharts(); 
     setTimeout(animateCharts, 100);
     loadTop5(); // Запрашиваем реальный топ-5 у бека
+
   }
   feather.replace();
 }
