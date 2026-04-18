@@ -1,15 +1,45 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter
 from app.mock_bonds import MOCK_BONDS
+from app.models import GoalRequest
 
 router = APIRouter()
 
-@router.get("/")
-def goal(
-    amount: float = Query(..., description="Сумма инвестирования"),
-    target_yield: float = Query(..., description="Желаемая доходность в процентах")
-):
+# Генерация календаря выплат
+def build_payment_schedule(price, coupon, lots):
+    """
+    Генерирует условный календарь выплат по облигации.
+    Частота выплат зависит от купонной ставки.
+    """
+
+    if coupon is None:
+        return []
+
+    # Определяем частоту выплат
+    if coupon < 9:
+        periods = 1
+        months = ["Декабрь"]
+    elif coupon < 12:
+        periods = 2
+        months = ["Июнь", "Декабрь"]
+    else:
+        periods = 4
+        months = ["Март", "Июнь", "Сентябрь", "Декабрь"]
+
+    invested = price * lots
+    annual_income = invested * coupon / 100
+    payment = round(annual_income / periods, 2)
+
+    return [{"month": m, "amount": payment} for m in months]
+
+# Эндпоинт /goal
+@router.post("/")
+def goal(req: GoalRequest):
+    amount = req.amount
+    target_yield = req.target_yield
+
     bonds = [bond.model_dump() for bond in MOCK_BONDS]
 
+    # Фильтрация по доходности
     filtered = [b for b in bonds if float(b["yield_percent"]) >= target_yield]
 
     if not filtered:
@@ -28,19 +58,34 @@ def goal(
         invested = round(lots * price, 2)
         annual_income = round(invested * float(b["yield_percent"]) / 100, 2)
 
-        bcopy = b.copy()
-        bcopy["lots"] = lots
-        bcopy["invested"] = invested
-        bcopy["annual_income"] = annual_income
+        bcopy = {
+            "ticker": b["ticker"],
+            "name": b["name"],
+            "price": b["price"],
+            "yield_percent": b["yield_percent"],
+            "duration": b["duration"],
+            "coupon": b.get("coupon"),
+            "yield_to_maturity": b.get("yield_to_maturity"),
+            "lots": lots,
+            "invested": invested,
+            "annual_income": annual_income,
+        }
+
+        # Добавляем календарь выплат
+        bcopy["payment_schedule"] = build_payment_schedule(
+            price=b["price"],
+            coupon=b.get("coupon"),
+            lots=lots
+        )
 
         results.append(bcopy)
 
-    #Сортируем по доходу
+    # Сортировка по годовому доходу
     results = sorted(results, key=lambda x: x["annual_income"], reverse=True)
 
     top5 = results[:5]
 
-    # Метрики для графиков 
+    # Средние значения
     avg_yield = sum(b["yield_percent"] for b in top5) / len(top5)
     avg_income = sum(b["annual_income"] for b in top5) / len(top5)
 
