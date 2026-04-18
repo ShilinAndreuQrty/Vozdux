@@ -50,7 +50,9 @@ result=po
 
 explanation = (
         f"Выбрана облигация {po.get('name','')} ({po.get('ticker','')}) с рейтингом {po.get('rating'):.4f}. "
-        f"Доходность {po.get('yield_percent')}%, риск {po.get('risk')}, сроком на {po.get('duration')} мес."
+        f"Доходность {po.get('yield_percent')}%, риск {po.get('risk')}, сроком на {po.get('duration')} мес.\n"
+        f"Наивысшее соотношение между доходностью, риском и сроком"
 )
+
 print(explanation)
 #pd.to_json()
