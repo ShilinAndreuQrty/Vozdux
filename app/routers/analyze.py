@@ -6,18 +6,7 @@ from app.mock_bonds import MOCK_BONDS
 
 router = APIRouter()
 
-<<<<<<< Updated upstream
 @router.post('/', response_model=AnalyzeResponse)
-=======
-# Пример мок-списка облигаций (можно заменить на реальный источник)
-MOCK_BONDS = [
-    {"ticker": "SU26238RMFS6", "name": "ОФЗ 26238", "price": 101.2, "yield_percent": 10.5, "risk": 1, "duration": 36, "issuer_rating": "AAA(RU)"},
-    {"ticker": "GAZP", "name": "Газпром облигация", "price": 98.7, "yield_percent": 12.1, "risk": 2, "duration": 12, "issuer_rating": "AA+(RU)"},
-    {"ticker": "SU26240RMFS", "name": "ОФЗ 26240", "price": 98.5, "yield_percent": 11.8, "risk": 1, "duration": 24, "issuer_rating": "AAA(RU)"},
-]
-
-@router.post('/')
->>>>>>> Stashed changes
 def analyze(user_input: UserInput):
     """
     Приходит от фронта: amount, risk, duration.
