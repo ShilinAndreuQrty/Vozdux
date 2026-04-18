@@ -238,6 +238,82 @@
     @keyframes pageIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
     footer { text-align: center; padding: 80px 0; color: var(--text-muted); font-size: 1rem; border-top: 1px solid var(--border); margin-top: 80px; }
+
+    /* Модальное окно */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 50px;
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s;
+    }
+    .modal-close:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .modal-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 25px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .modal-text {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text-main);
+      white-space: pre-line;
+    }
+
+    /* Блюр контента при открытом модале */
+    .container.blurred {
+      filter: blur(8px);
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -339,13 +415,21 @@
       <p style="margin-bottom: 8px;">• Доход: облигации, чья доходность наиболее близка к указанной цели.</p>
       <p style="margin-bottom: 8px;">• Рейтинг эмитента: приоритет — высокий рейтинг (низкий риск), затем доходность.</p>
       <p style="margin-bottom: 8px;">• Минимальный риск: сначала облигации с наименьшим риском, затем близость к целевой доходности.</p>
-      <p style="color: var(--text-muted); margin-top: 12px;">Анализ проводится по всему списку бумаг, загруженных с сервера.</p>
     </div>
   </div>
 
   <footer>
-    <p>© 2026 VozduxInvest. Demo версия проекта не является инвестиционной рекомендацией, а демонстрирует возможности проекта.</p>
+    <p>© 2026 VozduxInvest. Demo-версия проекта не является инвестиционной рекомендацией, а демонстрирует возможности проекта.</p>
   </footer>
+</div>
+
+<!-- Модальное окно для "Подробнее" -->
+<div class="modal-overlay" id="detailsModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeDetailsModal()">✕</button>
+    <div class="modal-title"><i data-feather="info"></i> Подробный анализ</div>
+    <div class="modal-text" id="modalExplanation"></div>
+  </div>
 </div>
 
 <script>
@@ -413,20 +497,34 @@ async function loadTop5() {
   container.innerHTML = '<div style="color:var(--text-muted)">Загрузка данных с сервера...</div>';
   
   try {
-    const response = await fetch(`${API_BASE}/top?by=${mode.key}`);
+    const response = await fetch(`${API_BASE}/top/?by=${mode.key}`);
     if (!response.ok) throw new Error("Ошибка получения списка");
     
     const payload = await response.json();
-    const top5 = Array.isArray(payload) ? payload : (payload.items || payload.top || []);
+    // Поддерживаем оба формата: новый (top_list) и старый (List[Bond])
+    const top5 = Array.isArray(payload) ? payload : (payload.top_list || payload.items || payload.top || []);
     
-    container.innerHTML = top5.map(b => `
-      <div class="top-item">
-        <span>${b.name} <small style="color:var(--text-muted); font-size:0.8em; margin-left:8px">${b.ticker}</small></span>
-        <span style="color: var(--primary); font-weight: 900; font-size: 1.1rem;">${mode.formatter(b)}</span>
-      </div>
-    `).join('');
+    if (!top5 || top5.length === 0) {
+      container.innerHTML = '<div style="color:var(--text-muted)">Данные не найдены</div>';
+      return;
+    }
+    
+    container.innerHTML = top5.map(b => {
+      // Используем formatter для отображения значения в зависимости от режима
+      let displayValue = mode.formatter(b);
+      // Если это дюрация и есть duration_metric, используем его
+      if (mode.key === 'duration' && b.duration_metric !== undefined) {
+        displayValue = b.duration_metric.toFixed(2);
+      }
+      return `
+        <div class="top-item">
+          <span>${b.name} <small style="color:var(--text-muted); font-size:0.8em; margin-left:8px">${b.ticker}</small></span>
+          <span style="color: var(--primary); font-weight: 900; font-size: 1.1rem;">${displayValue}</span>
+        </div>
+      `;
+    }).join('');
   } catch (error) {
-    console.error("Ошибка /top:", error);
+    console.error("Ошибка /top/:", error);
     container.innerHTML = '<div style="color:#ff4444">Не удалось загрузить данные топа с бэкенда</div>';
   }
 }
@@ -507,12 +605,45 @@ document.getElementById('bondForm').addEventListener('submit', async function(e)
   }
 
   // Рисуем вердикт системы, если есть
-  if (apiData.explanation) {
+  if (apiData.best_bond) {
     const exDiv = document.createElement('div');
     exDiv.className = 'bond-card visible';
     exDiv.style.gridColumn = '1 / -1';
     exDiv.style.background = 'rgba(0, 230, 195, 0.05)';
-    exDiv.innerHTML = `<h3 style="color:var(--primary); margin-bottom: 10px;"><i data-feather="cpu"></i> Вердикт алгоритма</h3><p style="font-size: 1.1rem; color: var(--text-main); white-space: pre-line;">${apiData.explanation}</p>`;
+    exDiv.style.position = 'relative';
+    
+    const bond = apiData.best_bond;
+    const hasFullExplanation = apiData.explanation && typeof apiData.explanation === 'object' && apiData.explanation.full;
+    
+    let explanationText = '';
+    if (apiData.explanation) {
+      if (typeof apiData.explanation === 'object' && apiData.explanation.short) {
+        explanationText = apiData.explanation.short;
+      } else if (typeof apiData.explanation === 'string') {
+        explanationText = apiData.explanation;
+      }
+    }
+    
+    exDiv.innerHTML = `
+      <h3 style="color:var(--primary); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+        <span><i data-feather="cpu"></i> Вердикт алгоритма</span>
+        ${hasFullExplanation ? '<a href="#" style="color: var(--text-muted); font-size: 0.9rem; text-decoration: underline; cursor: pointer; font-weight: 600;" onclick="openDetailsModal(event)">подробнее</a>' : ''}
+      </h3>
+      <div style="display: grid; gap: 12px; font-size: 1.05rem;">
+        <div><span style="color: var(--text-muted);">Облигация:</span> <b style="color: var(--primary);">${bond.name}</b></div>
+        <div><span style="color: var(--text-muted);">Доходность:</span> <b style="color: var(--primary);">${bond.yield_percent}%</b></div>
+        <div><span style="color: var(--text-muted);">Риск:</span> <b>${riskTranslation[bond.risk] || 'Неизвестно'}</b></div>
+        <div><span style="color: var(--text-muted);">Срок:</span> <b>${bond.duration} мес.</b></div>
+        <div><span style="color: var(--text-muted);">Рейтинг эмитента:</span> <b>${bond.issuer_rating}/3</b></div>
+      </div>
+      ${explanationText ? `<p style="font-size: 1rem; color: var(--text-muted); margin-top: 15px; white-space: pre-line;">${explanationText}</p>` : ''}
+    `;
+    
+    // Сохраняем full explanation для модала
+    if (hasFullExplanation) {
+      exDiv.dataset.fullExplanation = apiData.explanation.full;
+    }
+    
     container.appendChild(exDiv);
   }
 
@@ -799,6 +930,56 @@ function animateBackground() {
   drawArrow();
   requestAnimationFrame(animateBackground);
 }
+
+// --- 6. МОДАЛЬНОЕ ОКНО ДЛЯ "ПОДРОБНЕЕ" ---
+
+function openDetailsModal(event) {
+  event.preventDefault();
+  
+  // Находим ближайший элемент с data-fullExplanation
+  const verdictDiv = event.target.closest('.bond-card');
+  if (!verdictDiv || !verdictDiv.dataset.fullExplanation) {
+    console.error("Полное объяснение не найдено");
+    return;
+  }
+  
+  const fullExplanation = verdictDiv.dataset.fullExplanation;
+  
+  // Показываем модал
+  const modal = document.getElementById('detailsModal');
+  const modalExplanation = document.getElementById('modalExplanation');
+  
+  modalExplanation.textContent = fullExplanation;
+  modal.classList.add('active');
+  
+  // Добавляем blur к контейнеру
+  document.querySelector('.container').classList.add('blurred');
+  
+  // Обновляем иконки feather
+  feather.replace();
+}
+
+function closeDetailsModal() {
+  const modal = document.getElementById('detailsModal');
+  modal.classList.remove('active');
+  
+  // Убираем blur с контейнера
+  document.querySelector('.container').classList.remove('blurred');
+}
+
+// Закрытие модала по клику на overlay
+document.getElementById('detailsModal').addEventListener('click', (e) => {
+  if (e.target.id === 'detailsModal') {
+    closeDetailsModal();
+  }
+});
+
+// Закрытие модала по ESC
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeDetailsModal();
+  }
+});
 
 animateBackground();
 </script>
