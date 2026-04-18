@@ -351,7 +351,7 @@ const strategyToRisk = {
 // Главный запрос анализа
 async function fetchAnalysis(amount, risk, duration) {
   try {
-    const response = await fetch(`${API_BASE}/analyze`, {
+    const response = await fetch(`${API_BASE}/analyze/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount, risk, duration })
@@ -473,6 +473,23 @@ document.getElementById('bondForm').addEventListener('submit', async function(e)
     exDiv.style.background = 'rgba(0, 230, 195, 0.05)';
     exDiv.innerHTML = `<h3 style="color:var(--primary); margin-bottom: 10px;"><i data-feather="cpu"></i> Вердикт алгоритма</h3><p style="font-size: 1.1rem; color: var(--text-main);">${apiData.explanation}</p>`;
     container.appendChild(exDiv);
+  }
+
+  if (apiData.projection) {
+    const proj = apiData.projection;
+    const projDiv = document.createElement('div');
+    projDiv.className = 'bond-card visible';
+    projDiv.style.gridColumn = '1 / -1';
+    projDiv.innerHTML = `
+      <h3 style="color:var(--accent); margin-bottom: 14px;"><i data-feather="bar-chart-2"></i> Прогноз по выбранной облигации</h3>
+      <div style="display:grid; gap:10px; font-size:1.05rem;">
+        <div>Ориентировочно можно купить: <b>${proj.estimated_lots ?? 0}</b> шт.</div>
+        <div>Планируемо вложено: <b>${Number(proj.invested_amount ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+        <div>Ожидаемый доход за год: <b style="color:var(--primary)">${Number(proj.estimated_annual_income ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+      </div>
+      <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.95rem;">Расчёт демонстрационный и не является инвестиционной рекомендацией.</p>
+    `;
+    container.appendChild(projDiv);
   }
 
   // Рисуем лучшую облигацию

@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 
 from app.routers.bonds import router as bonds_router
 from app.routers.analyze import router as analyze_router
@@ -7,8 +6,6 @@ from app.routers.ticker import router as ticker_router
 from app.routers.health import router as health_router 
 
 from fastapi.middleware.cors import CORSMiddleware
-
-import requests
 
 app = FastAPI()
 
