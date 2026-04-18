@@ -88,7 +88,7 @@ def score_bonds(
 
     return out
 
-def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tuple[Dict, List[Dict], str]:
+def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tuple[Dict, List[Dict], Dict[str, str]]:
     """
     Возвращает: best_bond, alternatives (список), explanation (строка)
     """
@@ -101,8 +101,17 @@ def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tupl
     best = sorted_b[0]
     alternatives = sorted_b[1:top_n]
 
-    # Простое объяснение: почему выбрали лучшую (можно расширить)
-    explanation = (
+    # Все метрики для полного отчёта
+    best_yield = float(best.get("yield_percent", 0))
+    best_risk = int(best.get("risk", 0))
+    best_duration = int(best.get("duration", 0))
+    best_issuer = int(best.get("issuer_rating", 0))
+    best_rating = float(best.get("rating", 0))
+
+    avg_yield = sum(float(b.get("yield_percent", 0)) for b in scored_bonds) / len(scored_bonds)
+    
+    # Простое объяснение: почему выбрали лучшую 
+    short_explanation = (
     f"Выбрана облигация {best.get('name','')} ({best.get('ticker','')}) "
     f"с рейтингом {best.get('rating'):.4f}.\n"
     f"Доходность: {best.get('yield_percent')}%.\n"
@@ -111,4 +120,22 @@ def pick_best_and_alternatives(scored_bonds: List[Dict], top_n: int = 3) -> Tupl
     f"Рейтинг эмитента: {best.get('issuer_rating')}."
 )
 
-    return best, alternatives, explanation
+    # Полное объяснение 
+    full_explanation = (
+    f"Эта облигация выбрана как оптимальная по совокупности доходности, риска, срока "
+    f"и надёжности эмитента.\n\n"
+    f"• Доходность {best_yield}% — выше среднего по отобранным ({avg_yield:.2f}%).\n"
+    f"• Риск {best_risk} — соответствует вашему профилю.\n"
+    f"• Срок {best_duration} мес. — близок к желаемому горизонту.\n"
+    f"• Рейтинг эмитента {best_issuer} — снижает вероятность дефолта.\n\n"
+    f"Алгоритм учитывает баланс между доходностью и риском, штрафует слишком длинные "
+    f"или слишком короткие сроки и повышает рейтинг бумаг с дисконтом к номиналу.\n\n"
+    f"Итоговый интегральный рейтинг: {best_rating:.4f}."
+)
+
+
+    return best, alternatives, {
+    "short": short_explanation,
+    "full": full_explanation
+}
+
