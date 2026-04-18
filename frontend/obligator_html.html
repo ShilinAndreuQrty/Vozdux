@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BondSelect Pro — Инвестиционный Аналитик</title>
+  <title>VozduxInvest — Инвестиционный Аналитик</title>
   <script src="https://unpkg.com/feather-icons"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -247,7 +247,7 @@
 
 <div class="container">
   <nav class="app-nav">
-    <div class="logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div><span>BondSelect Pro</span></div>
+    <div class="logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div><span>VozduxInvest</span></div>
     <div class="nav-tabs">
       <a href="#" class="nav-link active" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
       <a href="#" class="nav-link" onclick="switchPage('analytics', event)"><i data-feather="pie-chart"></i> Аналитика</a>
@@ -334,10 +334,17 @@
       </div>
       <div id="top5List" class="top-list"></div>
     </div>
+    <div class="stat-box" style="text-align:left; margin-top: 24px;">
+      <h3 style="font-size: 1.3rem; margin-bottom: 16px;"><i data-feather="info"></i> Как формируется топ</h3>
+      <p style="margin-bottom: 8px;">• Доход: облигации, чья доходность наиболее близка к указанной цели.</p>
+      <p style="margin-bottom: 8px;">• Рейтинг эмитента: приоритет — высокий рейтинг (низкий риск), затем доходность.</p>
+      <p style="margin-bottom: 8px;">• Минимальный риск: сначала облигации с наименьшим риском, затем близость к целевой доходности.</p>
+      <p style="color: var(--text-muted); margin-top: 12px;">Анализ проводится по всему списку бумаг, загруженных с сервера.</p>
+    </div>
   </div>
 
   <footer>
-    <p>© 2026 BondSelect Pro. Информация носит ознакомительный характер и не является инвестиционной рекомендацией.</p>
+    <p>© 2026 VozduxInvest. Demo версия проекта не является инвестиционной рекомендацией, а демонстрирует возможности проекта.</p>
   </footer>
 </div>
 
@@ -380,7 +387,7 @@ async function fetchAnalysis(amount, risk, duration) {
 
 const topModes = [
   { key: 'yield', title: 'Топ-5 по доходности', valueLabel: 'Доходность', formatter: (item) => `${item.yield_percent ?? 'н/д'}%` },
-  { key: 'issuer', title: 'Топ-5 по рейтингу эмитента', valueLabel: 'Рейтинг', formatter: (item) => item.issuer_rating ?? item.issuer ?? 'н/д' },
+  { key: 'issuer', title: 'Топ-5 по рейтингу эмитента', valueLabel: 'Рейтинг', formatter: (item) => item.issuer_rating ?? 'н/д' },
   { key: 'duration', title: 'Топ-5 по модифицированной дюрации', valueLabel: 'Дюрация', formatter: (item) => item.modified_duration ?? item.duration ?? 'н/д' }
 ];
 let topModeIndex = 0;
@@ -409,7 +416,8 @@ async function loadTop5() {
     const response = await fetch(`${API_BASE}/top?by=${mode.key}`);
     if (!response.ok) throw new Error("Ошибка получения списка");
     
-    const top5 = await response.json();
+    const payload = await response.json();
+    const top5 = Array.isArray(payload) ? payload : (payload.items || payload.top || []);
     
     container.innerHTML = top5.map(b => `
       <div class="top-item">
@@ -520,7 +528,6 @@ document.getElementById('bondForm').addEventListener('submit', async function(e)
         <div>Планируемо вложено: <b>${Number(proj.invested_amount ?? 0).toLocaleString('ru-RU')} ₽</b></div>
         <div>Ожидаемый доход за год: <b style="color:var(--primary)">${Number(proj.estimated_annual_income ?? 0).toLocaleString('ru-RU')} ₽</b></div>
       </div>
-      <p style="margin-top: 12px; color: var(--text-muted); font-size: 0.95rem;">Расчёт демонстрационный и не является инвестиционной рекомендацией.</p>
     `;
     container.appendChild(projDiv);
   }
