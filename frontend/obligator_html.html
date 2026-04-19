@@ -876,6 +876,16 @@
       text-align: center;
     }
 
+    /* Планировщик: таблица с горизонтальной прокруткой на мобильных */
+    .goal-table-wrapper { overflow-x: auto; }
+    .goal-table { width: 100%; border-collapse: collapse; min-width: 980px; }
+    .goal-table th, .goal-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); text-align: left; }
+    .goal-table thead th { color: var(--text-muted); font-weight:700; font-size:0.85rem; }
+
+    /* Заставляем кнопки фильтров в Базе знаний быть одинаковой ширины */
+    .knowledge-selector { display:flex; gap:12px; }
+    .knowledge-selector .knowledge-btn { flex:1; min-width:120px; }
+
     /* Адаптив для страниц */
     @media (max-width: 768px) {
       .about-content {
@@ -978,15 +988,15 @@
         <h3><i data-feather="target"></i> Планировщик целевой доходности</h3>
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
           <div style="flex:1; min-width:220px;">
-            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;">Желаемый доход в год (₽)</label>
-            <input id="goalAmount" type="number" value="100000" style="width:100%; padding:12px; border-radius:10px;" title="Введите желаемую сумму годового дохода" />
+            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;"><i data-feather="database"></i> Сумма инвестиций (₽)</label>
+            <input id="goalAmount" type="number" value="100000" style="width:100%; padding:12px; border-radius:10px;" title="Сумма, которую вы готовы вложить" />
           </div>
           <div style="width:220px;">
-            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;">Желаемый доход в год (%)</label>
-            <input id="goalTargetYield" type="number" value="6" style="width:100%; padding:12px; border-radius:10px;" title="Целевая доходность — это процент прибыли, на который вы рассчитываете" />
+            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;"><i data-feather="target"></i> Желаемая доходность (%)</label>
+            <input id="goalTargetYield" type="number" value="6" style="width:100%; padding:12px; border-radius:10px;" title="Процентная доходность, на которую вы рассчитываете" />
           </div>
           <div style="align-self:end">
-            <button class="btn-main" id="goalCalcBtn">Рассчитать план</button>
+            <button class="btn-main" id="goalCalcBtn">Рассчитать стратегию</button>
           </div>
         </div>
       </div>
@@ -1172,6 +1182,10 @@ function renderGoalResults(data) {
     return;
   }
 
+  // Очищаем основной блок результатов (если был открыт раздел Подбор)
+  const mainResults = document.getElementById('results');
+  if (mainResults) mainResults.innerHTML = '';
+
   lastGoalData = data;
 
   const top = data.top_bonds;
@@ -1187,7 +1201,7 @@ function renderGoalResults(data) {
 
   const tableRows = top.map((b, i) => {
     const name = b.name || b.ticker || '—';
-    const ticker = b.ticker ? ` <small style="color:var(--text-muted);">${b.ticker}</small>` : '';
+    const ticker = b.ticker ? `<div style="font-size:0.85rem; color:var(--text-muted); margin-top:6px;">${b.ticker}</div>` : '';
     const price = b.price ?? b.nominal ?? 0;
     const yieldP = b.yield_percent ?? b.yield ?? 0;
     const coupon = b.coupon ?? '--';
@@ -1199,7 +1213,7 @@ function renderGoalResults(data) {
 
     return `
       <tr>
-        <td>${name}${ticker}</td>
+        <td><div style="font-weight:700">${name}</div>${ticker}</td>
         <td>${formatMoney(price)} ₽</td>
         <td>${yieldP}%</td>
         <td>${coupon}</td>
@@ -1208,7 +1222,7 @@ function renderGoalResults(data) {
         <td>${lots}</td>
         <td>${formatMoney(invested)} ₽</td>
         <td>${formatMoney(income)} ₽</td>
-        <td><button class="btn-main" style="padding:6px 10px; font-size:0.9rem;" onclick="openPaymentScheduleModal(${i})">График выплат</button></td>
+        <td><button class="btn-main" style="padding:6px 10px; font-size:0.9rem; display:flex; align-items:center; gap:8px;" onclick="openPaymentScheduleModal(${i})"><i data-feather="calendar"></i> График выплат</button></td>
       </tr>
     `;
   }).join('');
@@ -1219,12 +1233,12 @@ function renderGoalResults(data) {
       <table class="goal-table">
         <thead>
           <tr>
-            <th>Название</th>
-            <th>Цена</th>
-            <th>Доходность (%)</th>
-            <th>Купон (%)</th>
-            <th>YTM (%)</th>
-            <th>Срок (мес)</th>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Текущая доходность (%)</th>
+                <th>Купон (%)</th>
+                <th>YTM (%)</th>
+                <th>Дюрация (мес)</th>
             <th>Лотов (шт)</th>
             <th>Вложено (₽)</th>
             <th>Доход за год (₽)</th>
@@ -1251,7 +1265,7 @@ function openPaymentScheduleModal(index) {
   const modalExplanation = document.getElementById('modalExplanation');
 
   if (!Array.isArray(schedule) || schedule.length === 0) {
-    modalExplanation.innerHTML = '<div style="color:var(--text-muted)">График выплат не доступен</div>';
+    modalExplanation.innerHTML = '<div style="color:var(--text-muted)">Выплаты в конце срока</div>';
   } else {
     const list = schedule.map(s => `<div style="display:flex; justify-content:space-between; gap:12px; padding:6px 0;"><span>${s.month}</span><span><i data-feather="layers" style="margin-right:8px"></i> ${formatMoney(s.amount)} ₽</span></div>`).join('');
     modalExplanation.innerHTML = `<div><strong>${bond.name || bond.ticker}</strong></div>${list}`;
