@@ -753,7 +753,7 @@
       flex-wrap: wrap;
     }
     .knowledge-btn {
-      padding: 14px 28px;
+      padding: 14px 24px;
       border-radius: 20px;
       border: 1px solid var(--border);
       background: var(--card-bg);
@@ -765,6 +765,9 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      min-width: 140px;
+      justify-content: center;
+      box-sizing: border-box;
     }
     .knowledge-btn:hover {
       border-color: var(--primary);
@@ -898,14 +901,14 @@
   <nav class="app-nav">
     <div class="logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div><span>VozduxInvest</span></div>
     <div class="nav-tabs">
-      <a href="#" class="nav-link active" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
-      <a href="#" class="nav-link" onclick="switchPage('about', event)"><i data-feather="users"></i> О нас</a>
+      <a href="#" class="nav-link active" onclick="switchPage('about', event)"><i data-feather="users"></i> О нас</a>
+      <a href="#" class="nav-link" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
       <a href="#" class="nav-link" onclick="switchPage('analytics', event)"><i data-feather="pie-chart"></i> Аналитика</a>
       <a href="#" class="nav-link" onclick="switchPage('knowledge', event)"><i data-feather="book-open"></i> База знаний</a>
     </div>
   </nav>
 
-  <div id="page-select" class="page active">
+  <div id="page-select" class="page">
     <div class="strategy-menu">
       <div class="strategy-card active" onclick="applyStrategy('safe', this)">
         <i data-feather="shield"></i>
@@ -939,7 +942,7 @@
         <div class="form-grid">
           <div class="form-group">
             <label id="amountLabel"><i data-feather="credit-card"></i> Сумма инвестиций (₽)</label>
-            <input type="number" id="amount" value="1000000" min="1000">
+            <input type="number" id="amount" value="1000" min="1000" step="1000">
           </div>
           <div class="form-group">
             <label><i data-feather="calendar"></i> Горизонт планирования</label>
@@ -1091,7 +1094,7 @@ function setSearchMode(mode, el) {
   const label = document.getElementById('amountLabel');
   if (mode === 'by_sum') {
     label.innerHTML = '<i data-feather="credit-card"></i> Сумма инвестиций (₽)';
-    amountInput.value = 1000000;
+    amountInput.value = 1000;
   } else {
     label.innerHTML = '<i data-feather="trending-up"></i> Желаемый доход в месяц (₽)';
     amountInput.value = 1000;
@@ -1662,11 +1665,11 @@ let moveProgress = 1;
 let moveDuration = 180;
 let trailSegments = [];
 
-const driftSpeed = 2.8;
-const freqMultiplier = 1.75;
-const arrowOpacity = 0.5;
-const trailOpacity = 0.3;
-const maxAge = 600;
+const driftSpeed = 0.5;
+const freqMultiplier = 1.2;
+const arrowOpacity = 0.4;
+const trailOpacity = 0.1;
+const maxAge = 1600;
 
 function resizeBackgroundCanvas() {
   bgWidth = bgCanvas.width = window.innerWidth;

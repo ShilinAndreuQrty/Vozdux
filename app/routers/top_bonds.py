@@ -8,7 +8,7 @@ router = APIRouter()
 @router.get("/")
 def top_bonds(by: str = Query("yield", enum=["yield", "duration", "ytm", "coupon"])):
     """
-    Возвращает топ-5 облигаций по выбранному параметру.
+    Возвращает топ-20 облигаций по выбранному параметру.
 
     Параметры сортировки:
     - yield    → сортировка по текущей доходности (по убыванию)
@@ -76,10 +76,10 @@ def top_bonds(by: str = Query("yield", enum=["yield", "duration", "ytm", "coupon
             reverse=True
         )
 
-    # Формируем финальный список 
-    top5 = []
-    for b in sorted_bonds[:5]:
-        top5.append({
+    # Формируем финальный список (теперь 20 облигаций вместо 5)
+    top_bonds = []
+    for b in sorted_bonds[:20]:
+        top_bonds.append({
             "ticker": b["ticker"],
             "name": b["name"],
             "price": b["price"],
@@ -90,6 +90,6 @@ def top_bonds(by: str = Query("yield", enum=["yield", "duration", "ytm", "coupon
         })
 
     return {
-        "top_list": top5,
+        "top_list": top_bonds,
         "sorted_by": by
     }
