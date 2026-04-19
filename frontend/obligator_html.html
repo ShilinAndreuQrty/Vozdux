@@ -425,10 +425,10 @@
     
     .stat-box {
       background: var(--card-bg); padding: 50px; border-radius: var(--radius-lg);
-      border: 1px solid var(--glass-border); text-align: center;
+      border: 1px solid var(--glass-border); text-align: left;
       box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
-    .chart-container { position: relative; width: 250px; height: 250px; margin: 0 auto 30px; }
+    .chart-container { position: relative; width: 250px; height: 250px; margin: 0 0 30px 0; }
     .chart-svg { transform: rotate(90deg) scaleX(-1); width: 250px; height: 250px; }
     .chart-bg { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 15; }
     .chart-fill {
@@ -655,84 +655,25 @@
 
     /* === СТРАНИЦА "О НАС" === */
     .about-container { max-width: 1200px; margin: 0 auto; }
-    .about-header {
-      text-align: center;
-      margin-bottom: 50px;
-    }
-    .about-header h2 {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-    }
-    .about-subtitle {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-    }
-    .about-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 25px;
-      margin-bottom: 40px;
-    }
-    .about-card {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 35px;
-      transition: var(--transition-smooth);
-    }
-    .about-card:hover {
-      transform: translateY(-5px);
-      border-color: var(--primary);
-    }
-    .about-icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 16px;
-      background: rgba(0, 230, 195, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      color: var(--primary);
-    }
-    .about-card h3 {
-      font-size: 1.3rem;
-      margin-bottom: 15px;
-      color: white;
-    }
-    .about-card p {
-      font-size: 1rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
-    .about-disclaimer {
-      background: rgba(255, 68, 68, 0.1);
-      border: 1px solid rgba(255, 68, 68, 0.3);
-      border-radius: var(--radius-md);
-      padding: 25px;
-      text-align: center;
-    }
-    .about-disclaimer p {
-      color: var(--text-main);
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    .about-disclaimer i {
-      color: #ff6b6b;
-      flex-shrink: 0;
-    }
+    .about-header { text-align: center; margin-bottom: 50px; }
+    .about-header h2 { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 15px; }
+    .about-subtitle { font-size: 1.2rem; color: var(--text-muted); }
+    .about-content { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; margin-bottom: 40px; }
+    .about-card { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 35px; transition: var(--transition-smooth); }
+    .about-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+    .about-icon { width: 60px; height: 60px; border-radius: 16px; background: rgba(0, 230, 195, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; color: var(--primary); }
+    .about-card h3 { font-size: 1.3rem; margin-bottom: 15px; color: white; }
+    .about-card p { font-size: 1rem; color: var(--text-muted); line-height: 1.7; }
+    .about-disclaimer { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); border-radius: var(--radius-md); padding: 25px; text-align: center; }
+    .about-disclaimer p { color: var(--text-main); font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .about-disclaimer i { color: #ff6b6b; flex-shrink: 0; }
 
-    /* === СТРАНИЦА "БАЗА ЗНАНИЙ" === */
+    @media (max-width: 768px) {
+      .about-content { grid-template-columns: 1fr; }
+      /* Группировка связанных блоков на мобильных */
+      .about-content .about-card:nth-child(1), .about-content .about-card:nth-child(2) { grid-column: span 1; }
+    }
+    /* === СТРАНИЦА "ТОП" === */
     .knowledge-header {
       text-align: center;
       margin-bottom: 35px;
@@ -917,14 +858,14 @@
   <nav class="app-nav">
     <div class="logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div><span>VozduxInvest</span></div>
     <div class="nav-tabs">
-      <a href="#" class="nav-link" onclick="switchPage('about', event)"><i data-feather="users"></i> О нас</a>
-      <a href="#" class="nav-link active" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
+      <a href="#" class="nav-link active" onclick="switchPage('about', event)"><i data-feather="users"></i> О нас</a>
+      <a href="#" class="nav-link" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
       <a href="#" class="nav-link" onclick="switchPage('analytics', event)"><i data-feather="pie-chart"></i> Аналитика</a>
-      <a href="#" class="nav-link" onclick="switchPage('knowledge', event)"><i data-feather="book-open"></i> База знаний</a>
+      <a href="#" class="nav-link" onclick="switchPage('knowledge', event)"><i data-feather="award"></i> Топ</a>
     </div>
   </nav>
 
-  <div id="page-select" class="page active">
+  <div id="page-select" class="page">
     <div class="strategy-menu">
       <div class="strategy-card active" onclick="applyStrategy('safe', this)">
         <i data-feather="shield"></i>
@@ -985,16 +926,16 @@
   <div id="page-analytics" class="page">
     <div class="planner-grid">
       <div class="stat-box" style="margin-bottom:20px;">
-        <h3><i data-feather="target"></i> Планировщик целевой доходности</h3>
+        <h3><i data-feather="bar-chart-2"></i> Планировщик целевой доходности</h3>
         <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
-          <div style="flex:1; min-width:220px;">
-            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;"><i data-feather="database"></i> Сумма инвестиций (₽)</label>
-            <input id="goalAmount" type="number" value="100000" style="width:100%; padding:12px; border-radius:10px;" title="Сумма, которую вы готовы вложить" />
-          </div>
-          <div style="width:220px;">
-            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;"><i data-feather="target"></i> Желаемая доходность (%)</label>
-            <input id="goalTargetYield" type="number" value="6" style="width:100%; padding:12px; border-radius:10px;" title="Процентная доходность, на которую вы рассчитываете" />
-          </div>
+	          <div style="flex:1; min-width:220px; display: flex; flex-direction: column; justify-content: flex-end;">
+            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;"><i data-feather="credit-card"></i> Сумма инвестиций (₽)</label>
+            <input id="goalAmount" type="number" value="1000" style="width:100%; padding:12px; border-radius:10px; height: 50px; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); color: white;" title="Сумма, которую вы готовы вложить" />
+	          </div>
+	          <div style="width:220px; display: flex; flex-direction: column; justify-content: flex-end;">
+            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;"><i data-feather="percent"></i> Желаемая доходность (%)</label>
+            <input id="goalTargetYield" type="number" value="15" style="width:100%; padding:12px; border-radius:10px; height: 50px; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); color: white;" title="Процентная доходность, на которую вы рассчитываете" />
+	          </div>
           <div style="align-self:end">
             <button class="btn-main" id="goalCalcBtn">Рассчитать стратегию</button>
           </div>
@@ -1007,37 +948,50 @@
   <!-- end Planner -->
 
   <!-- Страница "О нас" / О проекте -->
-  <div id="page-about" class="page">
-    <div class="about-container">
-      <h2>О проекте VozduxInvest</h2>
+	  <div id="page-about" class="page">
+	    <div class="about-container">
+	      <div class="about-header">
+	        <h2><i data-feather="info"></i> О проекте VozduxInvest</h2>
+	        <p class="about-subtitle">Ваш проводник в мире долгового рынка</p>
+	      </div>
+	
+	      <div class="about-content">
+	        <div class="about-card">
+	          <div class="about-icon"><i data-feather="target"></i></div>
+	          <h3>Наша миссия</h3>
+	          <p>Сделать инвестиции доступными для каждого. Мы помогаем новичкам сделать первые шаги, а опытным инвесторам — находить лучшие предложения.</p>
+	        </div>
+	
+	        <div class="about-card">
+	          <div class="about-icon"><i data-feather="zap"></i></div>
+	          <h3>Что мы можем?</h3>
+	          <p><strong>Для новичков:</strong> основы и выбор первых бумаг без ошибок.<br><strong>Для профи:</strong> мгновенный доступ к топам и фильтрам.</p>
+	        </div>
+	
+	        <div class="about-card">
+	          <div class="about-icon"><i data-feather="shield"></i></div>
+	          <h3>Безопасность</h3>
+	          <p>VozduxInvest — это демо-проект. Мы не храним ваши деньги и не даем рекомендаций. Только аналитика и обучение.</p>
+	        </div>
+	
+	        <div class="about-card">
+	          <div class="about-icon"><i data-feather="map"></i></div>
+	          <h3>Дорожная карта</h3>
+	          <p>• Авторизация и избранное<br>• Календарь выплат<br>• Брокерские API<br>• Покупка в один клик</p>
+	        </div>
+	      </div>
+	
+	      <div class="about-disclaimer">
+	        <p><i data-feather="alert-triangle"></i> Проект создан для образовательных целей и демонстрации возможностей.</p>
+	      </div>
+	    </div>
+	  </div>
 
-      <h3>Наша миссия</h3>
-      <p>Сделать инвестиции доступными для каждого — независимо от уровня опыта: помочь новичкам сделать первые шаги в мире инвестиций, а опытным инвесторам — оптимизировать работу с портфелем и находить наиболее выгодные предложения.</p>
-
-      <h3>Что мы можем?</h3>
-      <p><strong>Для новичков:</strong> мы поможем разобраться с основами, выбрать первые бумаги и избежать типичных ошибок.</p>
-      <p><strong>Для инвесторов с опытом:</strong> сэкономить время: выдать быстрый доступ к актуальной информации по нужным фильтрам.</p>
-
-      <h3>Безопасность</h3>
-      <p>VozduxInvest — это демо-проект. Мы не храним ваши деньги и не предоставляем инвестиционные рекомендации. Проект создан для образовательных целей и демонстрации возможностей.</p>
-
-      <h3>Дорожная карта</h3>
-      <p>Часть нашего будущего пути:</p>
-      <ul>
-        <li>Доработка UX/UI под ЦА</li>
-        <li>Авторизация и избранное</li>
-        <li>Добавление личного календаря выплат</li>
-        <li>Работа с брокерскими API в реальном времени</li>
-        <li>Возможность покупать "в один клик"</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Страница "База знаний" -->
+  <!-- Страница "Топ" -->
   <div id="page-knowledge" class="page">
     <div class="knowledge-header">
-      <h2><i data-feather="book-open"></i> База знаний</h2>
-      <p class="knowledge-subtitle">Каталог облигаций с детальной информацией</p>
+      <h2><i data-feather="award"></i> Топ облигаций</h2>
+      <p class="knowledge-subtitle">Лучшие предложения по ключевым показателям</p>
     </div>
     
     <!-- Селектор режимов -->
