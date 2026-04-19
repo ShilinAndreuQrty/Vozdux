@@ -197,6 +197,19 @@
       box-shadow: 0 15px 30px -10px rgba(0, 230, 195, 0.4);
     }
     .btn-main:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 20px 40px -10px rgba(0, 230, 195, 0.6); }
+    .btn-main:disabled,
+    .btn-main.disabled {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn-main:disabled:hover,
+    .btn-main.disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
 
     /* Скелетон загрузки */
     .skeleton {
@@ -385,11 +398,19 @@
       justify-content: space-between;
       align-items: center;
     }
+    .forecast-content > div:last-child {
+      margin-top: auto;
+    }
     .forecast-content span:first-child {
       color: var(--text-muted);
     }
     .forecast-content b {
       font-weight: 700;
+    }
+    .forecast-content .result-value {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
     }
 
     /* Аналитика */
@@ -544,7 +565,7 @@
       <form id="bondForm">
         <div class="mode-selector">
           <button type="button" class="mode-btn active" onclick="setSearchMode('by_sum', this)">От суммы вложений</button>
-          <button type="button" class="mode-btn" onclick="setSearchMode('by_income', this)">От желаемого дохода</button>
+          <button type="button" class="mode-btn" onclick="setSearchMode('by_target', this)">От желаемого дохода</button>
         </div>
         <div class="form-grid">
           <div class="form-group">
@@ -635,9 +656,12 @@ let searchMode = 'by_sum';
 let currentAmount = 0;
 let allBonds = [];       // весь ответ от бэка
 let activeBondIndex = 0; // текущая выбранная облигация
+let currentMode = 'by_sum'; // текущий режим поиска
+let userInputAmount = 0; // текущее значение из input'а
 
 function setSearchMode(mode, el) {
   searchMode = mode;
+  currentMode = mode;
   document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
   el.classList.add('active');
   
@@ -648,6 +672,9 @@ function setSearchMode(mode, el) {
     label.innerHTML = '<i data-feather="trending-up"></i> Желаемый доход в месяц (₽)';
   }
   feather.replace();
+  
+  // Сброс состояния при изменении режима
+  markDirty();
 }
 
 
@@ -764,6 +791,9 @@ termSelect.querySelectorAll('.option').forEach(opt => {
     termSelect.querySelector('.select-trigger span').innerText = opt.innerText;
     e.stopPropagation();
     termSelect.querySelector('.select-options').classList.remove('show');
+    
+    // Сброс состояния при изменении срока
+    markDirty();
   });
 });
 
@@ -791,22 +821,20 @@ function applyStrategy(type, el) {
   const term = type === 'safe' ? '12' : (type === 'balanced' ? '12' : '24');
   termInput.value = term;
   termSelect.querySelector('.select-trigger span').innerText = term + ' месяцев';
+  
+  // Сброс состояния при изменении стратегии
+  markDirty();
 }
 
 // --- 4. ОТПРАВКА ФОРМЫ И РЕНДЕР ---
 
 let currentApiData = null;
 
-function updateMainVerdict(bond, projection, explanation, required_capital) {
-  // БЭКЕНДЕРУ: Эта функция обновляет верхний блок verdict-forecast-container данными выбранной облигации.
-  // Фронтенд ожидает следующие поля в JSON-ответе от бэкенда для корректной отрисовки:
+function updateMainVerdict(bond, projection, explanation) {
+  // Фронтенд ожидает:
   // - bond: объект с полями name, yield_percent, risk, duration, issuer_rating, ticker, price
-  // - projection: объект с полями estimated_lots (число), invested_amount (число), estimated_annual_income (число)
-  // - explanation: объект с полями short (строка) и full (строка), или просто строка
-  // - required_capital: число (опционально, для режима by_income)
-  // Убедитесь, что в вашей Pydantic схеме эти поля присутствуют и имеют правильные типы.
-  // Для alternatives ожидаем, что у каждой есть свои projection, explanation и required_capital,
-  // иначе используются общие из корневого ответа (currentApiData.projection и т.д.).
+  // - projection: объект с полями lots, invested, annualIncome, monthlyIncome, required_capital
+  // - explanation: объект с полями short и full, или просто строка
   const mainBlock = document.querySelector('.verdict-forecast-container');
   if (!mainBlock) return;
 
@@ -817,7 +845,7 @@ function updateMainVerdict(bond, projection, explanation, required_capital) {
 
   const hasFullExplanation = explanation && typeof explanation === 'object' && explanation.full;
   
-  // Обновляем Вердикт
+  // Обновляем Вердикт (без "Необходимый капитал")
   const verdictContent = mainBlock.querySelector('.verdict-content');
   const verdictHeader = mainBlock.querySelector('.verdict-header');
   
@@ -832,28 +860,38 @@ function updateMainVerdict(bond, projection, explanation, required_capital) {
     <div><span>Риск:</span> <b>${riskTranslation[bond.risk] || 'Неизвестно'}</b></div>
     <div><span>Срок:</span> <b>${bond.duration} мес.</b></div>
     <div><span>Рейтинг эмитента:</span> <b>${bond.issuer_rating}/3</b></div>
-    ${searchMode === 'by_income' && required_capital ? `<div><span>Необходимый капитал:</span> <b style="color: var(--accent);">${Number(required_capital).toLocaleString('ru-RU')} ₽</b></div>` : ''}
   `;
 
   // Обновляем Прогноз
   const forecastContent = mainBlock.querySelector('.forecast-content');
   let forecastHTML = '';
-  if (searchMode === 'by_sum') {
+  
+  if (currentMode === 'by_sum') {
     // Режим "От суммы вложений"
+    const monthlyIncome = projection.monthlyIncome ?? 0;
+    const annualIncome = projection.annualIncome ?? 0;
+    
     forecastHTML = `
-      <div><span>Ориентировочно можно купить:</span> <b>${projection.estimated_lots ?? 0} шт.</b></div>
-      <div><span>Планируемо вложено:</span> <b>${Number(projection.invested_amount ?? 0).toLocaleString('ru-RU')} ₽</b></div>
-      <div style="margin-top: auto;"><span>Ожидаемый доход за год:</span> <b style="color: white;">${Number(projection.estimated_annual_income ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+      <div><span>Ожидаемый доход в месяц:</span> <b class="result-value">${Number(monthlyIncome).toLocaleString('ru-RU', {maximumFractionDigits: 2})} ₽</b></div>
+      <div><span>Ориентировочно можно купить:</span> <b>${projection.lots ?? 0} шт.</b></div>
+      <div><span>Планируемо вложено:</span> <b>${Number(projection.invested ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+      <div><span>Ожидаемый доход за год:</span> <b class="result-value">${Number(annualIncome).toLocaleString('ru-RU')} ₽</b></div>
     `;
   } else {
-    // Режим "От желаемого дохода"
-    const targetAnnualIncome = currentAmount * 12;
+    // Режим "От желаемого дохода в месяц"
+    const monthlyIncome = projection.monthlyIncome ?? 0;
+    const annualIncome = projection.annualIncome ?? 0;
+    const requiredCapital = projection.required_capital ?? '--';
+    const formattedCapital = requiredCapital === '--' ? '--' : Number(requiredCapital).toLocaleString('ru-RU');
+    
     forecastHTML = `
-      <div><span>Желаемый доход за год:</span> <b>${Number(targetAnnualIncome).toLocaleString('ru-RU')} ₽</b></div>
-      <div><span>Нужно купить:</span> <b>${projection.estimated_lots ?? 0} шт.</b></div>
-      <div style="margin-top: auto;"><span>Необходимый капитал:</span> <b style="color: white;">${Number(required_capital ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+      <div><span>Желаемый доход в месяц:</span> <b class="result-value">${Number(monthlyIncome).toLocaleString('ru-RU', {maximumFractionDigits: 2})} ₽</b></div>
+      <div><span>Желаемый доход за год:</span> <b>${Number(annualIncome).toLocaleString('ru-RU')} ₽</b></div>
+      <div><span>Нужно купить:</span> <b>${projection.lots ?? 0} шт.</b></div>
+      <div><span>Необходимый капитал:</span> <b class="result-value">${formattedCapital} ₽</b></div>
     `;
   }
+  
   forecastContent.innerHTML = forecastHTML;
 
   // Обновляем данные для модалки
@@ -866,14 +904,116 @@ function updateMainVerdict(bond, projection, explanation, required_capital) {
   feather.replace();
 }
 
+// Пересчет projection на основе текущей облигации и режима
+function recalcProjection(bond) {
+  if (!bond) return null;
+  
+  const price = parseFloat(bond.price) || 0;
+  const yieldPercent = parseFloat(bond.yield_percent) || 0;
+  
+  if (currentMode === 'by_sum') {
+    // Режим "От суммы вложений"
+    const amount = userInputAmount;
+    const lots = price > 0 ? Math.floor(amount / price) : 0;
+    const invested = lots * price;
+    const annualIncome = invested * (yieldPercent / 100);
+    const monthlyIncome = annualIncome / 12;
+    
+    return {
+      lots,
+      invested,
+      annualIncome,
+      monthlyIncome,
+      required_capital: null
+    };
+  } else {
+    // Режим "От желаемого дохода в месяц"
+    const monthlyIncome = userInputAmount;
+    const annualIncome = monthlyIncome * 12;
+    
+    if (yieldPercent > 0) {
+      const requiredCapital = annualIncome / (yieldPercent / 100);
+      const lots = price > 0 ? Math.floor(requiredCapital / price) : 0;
+      
+      return {
+        lots,
+        invested: requiredCapital,
+        annualIncome,
+        monthlyIncome,
+        required_capital: requiredCapital
+      };
+    } else {
+      return {
+        lots: 0,
+        invested: 0,
+        annualIncome,
+        monthlyIncome,
+        required_capital: 0
+      };
+    }
+  }
+}
+
 // Одна функция-рендерер для главного блока
 function renderMainBlock(bondData) {
   const bond = bondData.bond;
-  const projection = bondData.projection || {};
   const explanation = bondData.explanation;
-  const required_capital = bondData.required_capital;
+  
+  // Пересчитываем projection на основе текущих параметров
+  const projection = recalcProjection(bond);
+  
+  if (!projection) return;
+  
+  updateMainVerdict(bond, projection, explanation);
+}
 
-  updateMainVerdict(bond, projection, explanation, required_capital);
+// Функция сброса главного блока (очистка при изменении параметров)
+function resetMainBlock() {
+  const mainBlock = document.querySelector('.verdict-forecast-container');
+  if (!mainBlock) return;
+  
+  const verdictContent = mainBlock.querySelector('.verdict-content');
+  const forecastContent = mainBlock.querySelector('.forecast-content');
+  
+  if (verdictContent) {
+    verdictContent.innerHTML = `
+      <div><span>Облигация:</span> <b>--</b></div>
+      <div><span>Доходность:</span> <b>--</b></div>
+      <div><span>Риск:</span> <b>--</b></div>
+      <div><span>Срок:</span> <b>--</b></div>
+      <div><span>Рейтинг эмитента:</span> <b>--</b></div>
+    `;
+  }
+  
+  if (forecastContent) {
+    forecastContent.innerHTML = `
+      <div><span>Загрузка...</span> <b>--</b></div>
+      <div><span>Загрузка...</span> <b>--</b></div>
+      <div><span>Загрузка...</span> <b class="result-value">--</b></div>
+    `;
+  }
+}
+
+// Функция пометки "грязного" состояния (неактуальные данные)
+function markDirty() {
+  const button = document.querySelector('.btn-main');
+  if (button) {
+    button.disabled = false;
+    button.classList.remove('disabled');
+  }
+  
+  resetMainBlock();
+  
+  const container = document.getElementById('results');
+  if (container) {
+    // Удаляем карточки (оставляем только главный блок)
+    const cards = container.querySelectorAll('.bond-card');
+    cards.forEach(card => card.remove());
+  }
+  
+  // Сбрасываем состояние
+  allBonds.length = 0;
+  activeBondIndex = 0;
 }
 
 document.getElementById('bondForm').addEventListener('submit', async function(e) {
@@ -881,6 +1021,7 @@ document.getElementById('bondForm').addEventListener('submit', async function(e)
   
   const amount = parseInt(document.getElementById('amount').value) || 50000;
   currentAmount = amount; // Сохраняем для использования в updateMainVerdict
+  userInputAmount = amount; // Сохраняем для recalcProjection
   const term = parseInt(termInput.value) || 12;
   const strategyText = document.querySelector('.strategy-card.active h4').innerText.toLowerCase();
   const risk = strategyToRisk[strategyText] || 1;
@@ -960,6 +1101,13 @@ document.getElementById('bondForm').addEventListener('submit', async function(e)
 
   // Инициализируем главный блок данными первой карточки
   renderMainBlock(allBonds[0]);
+  
+  // Делаем кнопку неактивной после успешного анализа
+  const button = document.querySelector('.btn-main');
+  if (button) {
+    button.disabled = true;
+    button.classList.add('disabled');
+  }
   
   feather.replace();
 });
@@ -1064,6 +1212,12 @@ function animateValue(id, start, end, suffix) {
 const style = document.createElement('style');
 style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
 document.head.appendChild(style);
+
+// Обработчик изменения суммы инвестиции
+const amountInput = document.getElementById('amount');
+if (amountInput) {
+  amountInput.addEventListener('input', markDirty);
+}
 
 // Инициализация при старте
 feather.replace();

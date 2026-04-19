@@ -18,13 +18,15 @@ class Bond(BaseModel):
 class UserInput(BaseModel):
     amount : float
     risk : int 
-    duration : int 
+    duration : int
+    mode: str = "by_sum"  # "by_sum" или "by_target" 
 
 
 class Projection(BaseModel):
     estimated_lots: int
     invested_amount: float
     estimated_annual_income: float
+    required_capital: Optional[float] = None  # Для режима by_target
 
 
 class Explanation(BaseModel):
@@ -36,6 +38,7 @@ class AnalyzeResponse(BaseModel):
     alternatives: List[Bond]
     explanation: Explanation
     projection: Optional[dict]
+    required_capital: Optional[float] = None
 
 class GoalRequest(BaseModel):
     amount: float
