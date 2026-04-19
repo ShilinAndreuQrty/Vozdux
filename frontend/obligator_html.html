@@ -641,9 +641,256 @@
         margin-bottom: 6px;
       }
 
-      .strategy-text {
+    .strategy-text {
         display: flex;
         flex-direction: column;
+      }
+    }
+
+    /* === СТРАНИЦА "О НАС" === */
+    .about-container { max-width: 1200px; margin: 0 auto; }
+    .about-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .about-header h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    .about-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+    }
+    .about-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    .about-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 35px;
+      transition: var(--transition-smooth);
+    }
+    .about-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+    }
+    .about-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: rgba(0, 230, 195, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+    .about-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      color: white;
+    }
+    .about-card p {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .about-disclaimer {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      border-radius: var(--radius-md);
+      padding: 25px;
+      text-align: center;
+    }
+    .about-disclaimer p {
+      color: var(--text-main);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .about-disclaimer i {
+      color: #ff6b6b;
+      flex-shrink: 0;
+    }
+
+    /* === СТРАНИЦА "БАЗА ЗНАНИЙ" === */
+    .knowledge-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+    .knowledge-header h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    .knowledge-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+    .knowledge-selector {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .knowledge-btn {
+      padding: 14px 28px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .knowledge-btn:hover {
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+    .knowledge-btn.active {
+      background: var(--primary);
+      color: #050914;
+      border-color: var(--primary);
+      box-shadow: 0 4px 15px rgba(0, 230, 195, 0.3);
+    }
+    .knowledge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+    }
+    .knowledge-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      transition: var(--transition-smooth);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .knowledge-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .knowledge-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-glow);
+    }
+    .knowledge-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .knowledge-card-name {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: white;
+    }
+    .knowledge-card-ticker {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.05);
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .knowledge-card-yield {
+      background: rgba(0, 230, 195, 0.1);
+      padding: 18px 20px;
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .knowledge-card-yield span:first-child {
+      color: var(--text-muted);
+    }
+    .knowledge-card-yield .yield-value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+    .knowledge-card-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      font-size: 0.95rem;
+    }
+    .knowledge-card-stats > div {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .knowledge-card-stats span:first-child {
+      color: var(--text-muted);
+    }
+    .knowledge-card-stats b {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .knowledge-loading {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .knowledge-loading .skeleton {
+      height: 200px;
+      border-radius: 20px;
+    }
+    .knowledge-error {
+      grid-column: 1 / -1;
+      padding: 30px;
+      border-radius: 20px;
+      background: rgba(255,68,68,0.1);
+      border: 1px solid #ff4444;
+      color: #ff6b6b;
+      text-align: center;
+    }
+
+    /* Адаптив для страниц */
+    @media (max-width: 768px) {
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+      .knowledge-grid {
+        grid-template-columns: 1fr;
+      }
+      .knowledge-selector {
+        gap: 10px;
+      }
+      .knowledge-btn {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+      }
+      .nav-tabs {
+        flex-wrap: wrap;
+        justify-content: center;
       }
     }
   </style>
@@ -659,6 +906,8 @@
     <div class="nav-tabs">
       <a href="#" class="nav-link active" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
       <a href="#" class="nav-link" onclick="switchPage('analytics', event)"><i data-feather="pie-chart"></i> Аналитика</a>
+      <a href="#" class="nav-link" onclick="switchPage('about', event)"><i data-feather="users"></i> О нас</a>
+      <a href="#" class="nav-link" onclick="switchPage('knowledge', event)"><i data-feather="book-open"></i> База знаний</a>
     </div>
   </nav>
 
@@ -758,6 +1007,73 @@
       <p style="margin-bottom: 8px;">• Рейтинг эмитента: приоритет — высокий рейтинг (низкий риск), затем доходность.</p>
       <p style="margin-bottom: 8px;">• Минимальный риск: сначала облигации с наименьшим риском, затем близость к целевой доходности.</p>
     </div>
+  </div>
+
+  <!-- Страница "О нас" -->
+  <div id="page-about" class="page">
+    <div class="about-container">
+      <div class="about-header">
+        <h2><i data-feather="users"></i> О проекте VozduxInvest</h2>
+        <p class="about-subtitle">Демократизация инвестиционного рынка России</p>
+      </div>
+      
+      <div class="about-content">
+        <div class="about-card">
+          <div class="about-icon"><i data-feather="target"></i></div>
+          <h3>Наша миссия</h3>
+          <p>Мы убираем порог входа в инвестиции. Наша цель — сделать финансовые инструменты понятными для каждого, кто хочет приумножить свои сбережения, но не имеет специального образования.</p>
+        </div>
+        
+        <div class="about-card">
+          <div class="about-icon"><i data-feather="brain"></i></div>
+          <h3>Технологии</h3>
+          <p>Используем искусственный интеллект для анализа облигаций и подбора оптимальных решений под ваши цели. Алгоритм учитывает десятки параметров: от кредитного рейтинга до дюрации.</p>
+        </div>
+        
+        <div class="about-card">
+          <div class="about-icon"><i data-feather="shield"></i></div>
+          <h3>Безопасность</h3>
+          <p>VozduxInvest — это демо-проект. Мы не храним ваши деньги и не предоставляем инвестиционные рекомендации. Проект создан для образовательных целей и демонстрации возможностей.</p>
+        </div>
+        
+        <div class="about-card">
+          <div class="about-icon"><i data-feather="trending-up"></i></div>
+          <h3>Рост</h3>
+          <p>Проект постоянно развивается. В будущем планируется интеграция с реальными брокерскими API, расширение базы инструментов и добавление новых функций.</p>
+        </div>
+      </div>
+      
+      <div class="about-disclaimer">
+        <p><i data-feather="alert-triangle"></i> <strong>Важное предупреждение:</strong> Данный проект носит демонстрационный характер и не является инвестиционной рекомендацией. Все расчёты являются оценочными. Перед принятием инвестиционных решений консультируйтесь с профессиональным финансовым советником.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Страница "База знаний" -->
+  <div id="page-knowledge" class="page">
+    <div class="knowledge-header">
+      <h2><i data-feather="book-open"></i> База знаний</h2>
+      <p class="knowledge-subtitle">Каталог облигаций с детальной информацией</p>
+    </div>
+    
+    <!-- Селектор режимов -->
+    <div class="knowledge-selector">
+      <button class="knowledge-btn active" onclick="setKnowledgeMode('yield', this)" data-mode="yield">
+        <i data-feather="trending-up"></i> Доходность
+      </button>
+      <button class="knowledge-btn" onclick="setKnowledgeMode('duration', this)" data-mode="duration">
+        <i data-feather="clock"></i> Дюрация
+      </button>
+      <button class="knowledge-btn" onclick="setKnowledgeMode('ytm', this)" data-mode="ytm">
+        <i data-feather="activity"></i> YTM
+      </button>
+      <button class="knowledge-btn" onclick="setKnowledgeMode('coupon', this)" data-mode="coupon">
+        <i data-feather="percent"></i> Купон
+      </button>
+    </div>
+    
+    <!-- Контейнер с карточками -->
+    <div id="knowledge-grid" class="knowledge-grid"></div>
   </div>
 
   <footer>
@@ -935,7 +1251,9 @@ function switchPage(page, e) {
     resetCharts(); 
     setTimeout(animateCharts, 100);
     loadTop5(); // Запрашиваем реальный топ-5 у бека
-
+  } else if (page === 'knowledge') {
+    // Загружаем данные для страницы знаний
+    loadKnowledgeBonds();
   }
   feather.replace();
 }
@@ -1562,6 +1880,107 @@ document.addEventListener('keydown', (e) => {
 });
 
 animateBackground();
+
+// --- 7. СТРАНИЦА "БАЗА ЗНАНИЙ" ---
+
+// Режимы сортировки для Базы знаний
+const knowledgeModes = [
+  { key: 'yield', title: 'Доходность', api: 'yield' },
+  { key: 'duration', title: 'Дюрация', api: 'duration' },
+  { key: 'ytm', title: 'YTM', api: 'yield_to_maturity' },
+  { key: 'coupon', title: 'Купон', api: 'coupon' }
+];
+let currentKnowledgeMode = 'yield';
+
+// Установка режима сортировки
+function setKnowledgeMode(mode, el) {
+  currentKnowledgeMode = mode;
+  
+  // Обновляем активную кнопку
+  document.querySelectorAll('.knowledge-btn').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+  
+  // Загружаем данные
+  loadKnowledgeBonds();
+}
+
+// Загрузка облигаций для Базы знаний
+async function loadKnowledgeBonds() {
+  const container = document.getElementById('knowledge-grid');
+  if (!container) return;
+  
+  // Показываем skeleton загрузки
+  container.innerHTML = `
+    <div class="knowledge-loading">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  `;
+  
+  try {
+    const response = await fetch(`${API_BASE}/top/?by=${currentKnowledgeMode}`);
+    if (!response.ok) throw new Error("Ошибка сервера: " + response.status);
+    
+    const payload = await response.json();
+    // Поддерживаем оба формата
+    const bonds = Array.isArray(payload) ? payload : (payload.top_list || payload.items || payload.top || []);
+    
+    if (!bonds || bonds.length === 0) {
+      container.innerHTML = '<div class="knowledge-error">Нет данных для отображения</div>';
+      return;
+    }
+    
+    // Сортируем по выбранному режиму
+    const sorted = [...bonds].sort((a, b) => {
+      const key = knowledgeModes.find(m => m.key === currentKnowledgeMode)?.api || 'yield_percent';
+      const valA = parseFloat(a[key]) || 0;
+      const valB = parseFloat(b[key]) || 0;
+      return valB - valA; // По убыванию
+    });
+    
+    // Рендерим карточки
+    container.innerHTML = sorted.map((bond, index) => {
+      const price = parseFloat(bond.price) || 0;
+      const yieldP = parseFloat(bond.yield_percent) || 0;
+      const coupon = parseFloat(bond.coupon) || 0;
+      const ytm = parseFloat(bond.yield_to_maturity || bond.ytm) || 0;
+      const duration = parseInt(bond.duration) || 0;
+      
+      return `
+        <div class="knowledge-card" style="animation-delay: ${index * 0.1}s">
+          <div class="knowledge-card-header">
+            <div class="knowledge-card-name">${bond.name}</div>
+            <div class="knowledge-card-ticker">${bond.ticker}</div>
+          </div>
+          <div class="knowledge-card-yield">
+            <span>Доходность</span>
+            <span class="yield-value">${yieldP}%</span>
+          </div>
+          <div class="knowledge-card-stats">
+            <div><span>Цена</span> <b>${price} ₽</b></div>
+            <div><span>Купон</span> <b>${coupon}%</b></div>
+            <div><span>YTM</span> <b>${ytm}%</b></div>
+            <div><span>Дюрация</span> <b>${duration} мес</b></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    // Запускаем анимацию появления
+    setTimeout(() => {
+      container.querySelectorAll('.knowledge-card').forEach(card => {
+        card.classList.add('visible');
+      });
+    }, 50);
+    
+  } catch (error) {
+    console.error("Ошибка загрузки базы знаний:", error);
+    container.innerHTML = '<div class="knowledge-error">Ошибка загрузки данных. Проверьте подключение к серверу.</div>';
+  }
+  
+  feather.replace();
+}
 </script>
 </body>
 </html>
