@@ -1900,6 +1900,15 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// При загрузке страницы по умолчанию открываем раздел "Подбор"
+window.addEventListener('DOMContentLoaded', () => {
+  switchPage('select');
+  // Обновим класс активной вкладки в навигации
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const selectLink = Array.from(document.querySelectorAll('.nav-link')).find(a => a.getAttribute('onclick') && a.getAttribute('onclick').includes("'select'"));
+  if (selectLink) selectLink.classList.add('active');
+});
+
 animateBackground();
 
 // --- 7. СТРАНИЦА "БАЗА ЗНАНИЙ" ---
