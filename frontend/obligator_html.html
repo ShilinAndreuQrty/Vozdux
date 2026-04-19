@@ -413,6 +413,12 @@
       font-size: 1.1rem;
     }
 
+    /* Goal planner table responsive */
+    .goal-table-wrapper { overflow-x: auto; margin-bottom: 18px; }
+    .goal-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+    .goal-table th, .goal-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+    .goal-table thead th { background: transparent; color: var(--text-muted); font-weight:700; }
+
     /* Аналитика */
     .stats-grid { display: grid; grid-template-columns: 1fr; gap: 40px; margin-bottom: 50px; }
     @media (min-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -965,67 +971,62 @@
     <div id="results" class="results-grid"></div>
   </div>
 
+  <!-- Planner: целевая доходность -->
   <div id="page-analytics" class="page">
-    <div class="stats-grid">
-      <div class="stat-box">
-        <h3><i data-feather="layers"></i> Структура портфеля</h3>
-        <div class="chart-container">
-          <svg class="chart-svg" viewBox="0 0 250 250">
-            <circle class="chart-bg" cx="125" cy="125" r="120"></circle>
-            <circle id="chartType" class="chart-fill" cx="125" cy="125" r="120"></circle>
-          </svg>
-          <div class="chart-text" id="typeVal">0%</div>
+    <div class="planner-grid">
+      <div class="stat-box" style="margin-bottom:20px;">
+        <h3><i data-feather="target"></i> Планировщик целевой доходности</h3>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
+          <div style="flex:1; min-width:220px;">
+            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;">Желаемый доход в год (₽)</label>
+            <input id="goalAmount" type="number" value="100000" style="width:100%; padding:12px; border-radius:10px;" title="Введите желаемую сумму годового дохода" />
+          </div>
+          <div style="width:220px;">
+            <label style="display:block; font-weight:700; color:var(--text-muted); margin-bottom:8px;">Желаемый доход в год (%)</label>
+            <input id="goalTargetYield" type="number" value="6" style="width:100%; padding:12px; border-radius:10px;" title="Целевая доходность — это процент прибыли, на который вы рассчитываете" />
+          </div>
+          <div style="align-self:end">
+            <button class="btn-main" id="goalCalcBtn">Рассчитать план</button>
+          </div>
         </div>
-        <p style="font-size: 1.1rem;">Доля защитных активов в выборке</p>
       </div>
-      <div class="stat-box">
-        <h3><i data-feather="award"></i> Средняя доходность</h3>
-        <div class="chart-container">
-          <svg class="chart-svg" viewBox="0 0 250 250">
-            <circle class="chart-bg" cx="125" cy="125" r="120"></circle>
-            <circle id="chartYield" class="chart-fill" cx="125" cy="125" r="120" style="stroke: var(--accent);"></circle>
-          </svg>
-          <div class="chart-text" id="yieldVal">0%</div>
-        </div>
-        <p style="font-size: 1.1rem;">Ожидаемая годовая прибыль</p>
-      </div>
+
+      <div id="goalResults" style="grid-column: 1 / -1;"></div>
     </div>
   </div>
+  <!-- end Planner -->
 
-  <!-- Страница "О нас" -->
+  <!-- Страница "О нас" / Манифест -->
   <div id="page-about" class="page">
     <div class="about-container">
-      <div class="about-header">
-        <h2><i data-feather="users"></i> О проекте VozduxInvest</h2>
-        <p class="about-subtitle">Демократизация инвестиционного рынка России</p>
+      <!-- Манифест - заголовок -->
+      <div class="manifesto-header">
+        <h2>Инвестируй так же легко, как дышишь.</h2>
+        <p class="manifesto-text">VozduxInvest — это твой фильтр, который очищает рынок облигаций от «шума», оставляя только прозрачные цифры. Мы не учим тебя торговать. Мы помогаем тебе планировать жизнь.</p>
       </div>
       
-      <div class="about-content">
-        <div class="about-card">
-          <div class="about-icon"><i data-feather="target"></i></div>
-          <h3>Наша миссия</h3>
-          <p>Мы убираем порог входа в инвестиции. Наша цель — сделать финансовые инструменты понятными для каждого, кто хочет приумножить свои сбережения, но не имеет специального образования.</p>
+      <!-- Три столпа -->
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon"><i data-feather="shield"></i></div>
+          <h3>Ноль «умных» слов</h3>
+          <p>Забудь про дюрацию и НКД. Мы переводим финансовый хаос на человеческий язык.</p>
         </div>
         
-        <div class="about-card">
-          <div class="about-icon"><i data-feather="brain"></i></div>
-          <h3>Технологии</h3>
-          <p>Используем искусственный интеллект для анализа облигаций и подбора оптимальных решений под ваши цели. Алгоритм учитывает десятки параметров: от кредитного рейтинга до дюрации.</p>
+        <div class="pillar-card">
+          <div class="pillar-icon"><i data-feather="cpu"></i></div>
+          <h3>Математика против интуиции</h3>
+          <p>Алгоритм перебирает сотни облигаций за секунду, чтобы найти твою идеальную стратегию.</p>
         </div>
         
-        <div class="about-card">
-          <div class="about-icon"><i data-feather="shield"></i></div>
-          <h3>Безопасность</h3>
-          <p>VozduxInvest — это демо-проект. Мы не храним ваши деньги и не предоставляем инвестиционные рекомендации. Проект создан для образовательных целей и демонстрации возможностей.</p>
-        </div>
-        
-        <div class="about-card">
-          <div class="about-icon"><i data-feather="trending-up"></i></div>
-          <h3>Рост</h3>
-          <p>Проект постоянно развивается. В будущем планируется интеграция с реальными брокерскими API, расширение базы инструментов и добавление новых функций.</p>
+        <div class="pillar-card">
+          <div class="pillar-icon"><i data-feather="layers"></i></div>
+          <h3>Минимальный барьер</h3>
+          <p>Начни с цены чашки кофе. Инвестиции — это право, а не привилегия.</p>
         </div>
       </div>
       
+      <!-- Дисклеймер -->
       <div class="about-disclaimer">
         <p><i data-feather="alert-triangle"></i> <strong>Важное предупреждение:</strong> Данный проект носит демонстрационный характер и не является инвестиционной рекомендацией. Все расчёты являются оценочными. Перед принятием инвестиционных решений консультируйтесь с профессиональным финансовым советником.</p>
       </div>
@@ -1096,7 +1097,7 @@ function setSearchMode(mode, el) {
     label.innerHTML = '<i data-feather="credit-card"></i> Сумма инвестиций (₽)';
     amountInput.value = 1000;
   } else {
-    label.innerHTML = '<i data-feather="trending-up"></i> Желаемый доход в месяц (₽)';
+    label.innerHTML = '<i data-feather="trending-up"></i> Желаемый доход в год (₽)';
     amountInput.value = 1000;
   }
   feather.replace();
@@ -1138,64 +1139,127 @@ async function fetchAnalysis(amount, risk, duration) {
   }
 }
 
-const topModes = [
-  { key: 'yield', title: 'Топ-5 по доходности', valueLabel: 'Доходность', formatter: (item) => `${item.yield_percent ?? 'н/д'}%` },
-  { key: 'issuer', title: 'Топ-5 по рейтингу эмитента', valueLabel: 'Рейтинг', formatter: (item) => item.issuer_rating ?? 'н/д' },
-  { key: 'duration', title: 'Топ-5 по модифицированной дюрации', valueLabel: 'Дюрация', formatter: (item) => item.modified_duration ?? item.duration ?? 'н/д' }
-];
-let topModeIndex = 0;
-
-function updateTop5Title() {
-  const titleEl = document.getElementById('top5Title');
-  if (!titleEl) return;
-  titleEl.innerHTML = `<i data-feather="trending-up"></i> ${topModes[topModeIndex].title}`;
+// Используется эндпоинт /goal. Входные данные: amount и target_yield
+// Функции для Планировщика (Goal Planner)
+async function fetchGoalPlan(amount, targetYield) {
+  // Используется эндпоинт /goal. Входные данные: amount и target_yield
+  try {
+    const resp = await fetch(`${API_BASE}/goal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: amount, target_yield: targetYield })
+    });
+    if (!resp.ok) throw new Error('Ошибка сервера: ' + resp.status);
+    return await resp.json();
+  } catch (err) {
+    console.error('Ошибка запроса /goal:', err);
+    return null;
+  }
 }
 
-function switchTopMode(direction) {
-  topModeIndex = (topModeIndex + direction + topModes.length) % topModes.length;
-  updateTop5Title();
-  loadTop5();
+// Храним последний ответ планировщика
+let lastGoalData = null;
+
+function formatMoney(v) {
+  return Number(v ?? 0).toLocaleString('ru-RU');
+}
+
+function renderGoalResults(data) {
+  const container = document.getElementById('goalResults');
+  if (!container) return;
+  if (!data || !data.top_bonds || !Array.isArray(data.top_bonds)) {
+    container.innerHTML = '<div style="color:var(--text-muted)">Данные плана отсутствуют</div>';
+    return;
+  }
+
+  lastGoalData = data;
+
+  const top = data.top_bonds;
+  const avgYield = data.avg_yield_percent ?? '--';
+  const avgIncome = data.avg_annual_income ?? 0;
+
+  const summaryHTML = `
+    <div style="display:flex; gap:20px; align-items:center; margin-bottom:16px; flex-wrap:wrap;">
+      <div>Средняя доходность портфеля: <b style="color:var(--primary)">${avgYield}%</b></div>
+      <div>Общий ожидаемый доход в год: <b style="color:white">${formatMoney(avgIncome)} ₽</b></div>
+    </div>
+  `;
+
+  const tableRows = top.map((b, i) => {
+    const name = b.name || b.ticker || '—';
+    const ticker = b.ticker ? ` <small style="color:var(--text-muted);">${b.ticker}</small>` : '';
+    const price = b.price ?? b.nominal ?? 0;
+    const yieldP = b.yield_percent ?? b.yield ?? 0;
+    const coupon = b.coupon ?? '--';
+    const ytm = b.yield_to_maturity ?? b.ytm ?? '--';
+    const duration = b.duration ?? '--';
+    const lots = b.estimated_lots ?? b.lots ?? 0;
+    const invested = b.invested_amount ?? b.invested ?? (lots * price);
+    const income = b.estimated_annual_income ?? b.annual_income ?? (invested * (yieldP/100));
+
+    return `
+      <tr>
+        <td>${name}${ticker}</td>
+        <td>${formatMoney(price)} ₽</td>
+        <td>${yieldP}%</td>
+        <td>${coupon}</td>
+        <td>${ytm}</td>
+        <td>${duration}</td>
+        <td>${lots}</td>
+        <td>${formatMoney(invested)} ₽</td>
+        <td>${formatMoney(income)} ₽</td>
+        <td><button class="btn-main" style="padding:6px 10px; font-size:0.9rem;" onclick="openPaymentScheduleModal(${i})">График выплат</button></td>
+      </tr>
+    `;
+  }).join('');
+
+  const tableHTML = `
+    ${summaryHTML}
+    <div class="goal-table-wrapper">
+      <table class="goal-table">
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Цена</th>
+            <th>Доходность (%)</th>
+            <th>Купон (%)</th>
+            <th>YTM (%)</th>
+            <th>Срок (мес)</th>
+            <th>Лотов (шт)</th>
+            <th>Вложено (₽)</th>
+            <th>Доход за год (₽)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  container.innerHTML = tableHTML;
   feather.replace();
 }
 
-// Запрос списка для аналитики (Топ-5)
-async function loadTop5() {
-  const container = document.getElementById('top5List');
-  const mode = topModes[topModeIndex];
-  updateTop5Title();
-  container.innerHTML = '<div style="color:var(--text-muted)">Загрузка данных с сервера...</div>';
-  
-  try {
-    const response = await fetch(`${API_BASE}/top/?by=${mode.key}`);
-    if (!response.ok) throw new Error("Ошибка получения списка");
-    
-    const payload = await response.json();
-    // Поддерживаем оба формата: новый (top_list) и старый (List[Bond])
-    const top5 = Array.isArray(payload) ? payload : (payload.top_list || payload.items || payload.top || []);
-    
-    if (!top5 || top5.length === 0) {
-      container.innerHTML = '<div style="color:var(--text-muted)">Данные не найдены</div>';
-      return;
-    }
-    
-    container.innerHTML = top5.map(b => {
-      // Используем formatter для отображения значения в зависимости от режима
-      let displayValue = mode.formatter(b);
-      // Если это дюрация и есть duration_metric, используем его
-      if (mode.key === 'duration' && b.duration_metric !== undefined) {
-        displayValue = b.duration_metric.toFixed(2);
-      }
-      return `
-        <div class="top-item">
-          <span>${b.name} <small style="color:var(--text-muted); font-size:0.8em; margin-left:8px">${b.ticker}</small></span>
-          <span style="color: var(--primary); font-weight: 900; font-size: 1.1rem;">${displayValue}</span>
-        </div>
-      `;
-    }).join('');
-  } catch (error) {
-    console.error("Ошибка /top/:", error);
-    container.innerHTML = '<div style="color:#ff4444">Не удалось загрузить данные топа с бэкенда</div>';
+function openPaymentScheduleModal(index) {
+  if (!lastGoalData || !lastGoalData.top_bonds || !lastGoalData.top_bonds[index]) return;
+  const bond = lastGoalData.top_bonds[index];
+  const schedule = bond.payment_schedule || bond.paymentSchedule || [];
+
+  const modal = document.getElementById('detailsModal');
+  const modalExplanation = document.getElementById('modalExplanation');
+
+  if (!Array.isArray(schedule) || schedule.length === 0) {
+    modalExplanation.innerHTML = '<div style="color:var(--text-muted)">График выплат не доступен</div>';
+  } else {
+    const list = schedule.map(s => `<div style="display:flex; justify-content:space-between; gap:12px; padding:6px 0;"><span>${s.month}</span><span><i data-feather="layers" style="margin-right:8px"></i> ${formatMoney(s.amount)} ₽</span></div>`).join('');
+    modalExplanation.innerHTML = `<div><strong>${bond.name || bond.ticker}</strong></div>${list}`;
   }
+
+  modal.classList.add('active');
+  document.querySelector('.container').classList.add('blurred');
+  feather.replace();
 }
 
 // --- 3. UI ЛОГИКА ФРОНТЕНДА ---
@@ -1236,7 +1300,7 @@ function switchPage(page, e) {
   if(page === 'analytics') {
     resetCharts(); 
     setTimeout(animateCharts, 100);
-    loadTop5(); // Запрашиваем реальный топ-5 у бека
+    // Планировщик: ничего автоматически не грузим, ждём действий пользователя
   } else if (page === 'knowledge') {
     // Загружаем данные для страницы знаний
     loadKnowledgeBonds();
@@ -1651,6 +1715,18 @@ if (amountInput) {
 
 // Инициализация при старте
 feather.replace();
+
+// Привязка кнопки Планировщика (если присутствует)
+const goalBtn = document.getElementById('goalCalcBtn');
+if (goalBtn) {
+  goalBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const amount = Number(document.getElementById('goalAmount').value) || 0;
+    const target = Number(document.getElementById('goalTargetYield').value) || 0;
+    const res = await fetchGoalPlan(amount, target);
+    renderGoalResults(res);
+  });
+}
 
 // Анимированный фон со стрелкой
 const bgCanvas = document.getElementById('bgCanvas');
