@@ -776,95 +776,89 @@
       border-color: var(--primary);
       box-shadow: 0 4px 15px rgba(0, 230, 195, 0.3);
     }
-    .knowledge-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 25px;
+    
+    /* Таблица-список */
+    .knowledge-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
     }
-    .knowledge-card {
+    .knowledge-table thead th {
+      text-align: left;
+      padding: 16px 24px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      border-bottom: 1px solid var(--border);
+      background: transparent;
+    }
+    .knowledge-table thead th:first-child {
+      border-radius: 16px 0 0 16px;
+    }
+    .knowledge-table thead th:last-child {
+      border-radius: 0 16px 16px 0;
+    }
+    .knowledge-table tbody tr {
       background: var(--card-bg);
       backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 30px;
       transition: var(--transition-smooth);
-      opacity: 0;
-      transform: translateY(20px);
+      cursor: pointer;
     }
-    .knowledge-card.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .knowledge-card:hover {
+    .knowledge-table tbody tr:hover {
       border-color: var(--primary);
-      transform: translateY(-8px);
+      transform: scale(1.005);
       box-shadow: var(--shadow-glow);
     }
-    .knowledge-card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 20px;
+    .knowledge-table tbody td {
+      padding: 20px 24px;
+      font-size: 1rem;
+      color: var(--text-main);
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
     }
-    .knowledge-card-name {
-      font-size: 1.3rem;
-      font-weight: 800;
+    .knowledge-table tbody tr td:first-child {
+      border-radius: 16px 0 0 16px;
+      border-left: 1px solid var(--glass-border);
+    }
+    .knowledge-table tbody tr td:last-child {
+      border-radius: 0 16px 16px 0;
+      border-right: 1px solid var(--glass-border);
+    }
+    .knowledge-table tbody tr:hover td {
+      border-color: var(--glass-border);
+    }
+    .knowledge-table .kb-name {
+      font-weight: 700;
+      font-size: 1.05rem;
       color: white;
     }
-    .knowledge-card-ticker {
-      font-size: 0.9rem;
+    .knowledge-table .kb-ticker {
+      font-size: 0.85rem;
       color: var(--text-muted);
       background: rgba(255,255,255,0.05);
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
     }
-    .knowledge-card-yield {
-      background: rgba(0, 230, 195, 0.1);
-      padding: 18px 20px;
-      border-radius: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .knowledge-card-yield span:first-child {
-      color: var(--text-muted);
-    }
-    .knowledge-card-yield .yield-value {
-      font-size: 1.8rem;
+    .knowledge-table .kb-yield {
+      font-size: 1.3rem;
       font-weight: 900;
       color: var(--primary);
     }
-    .knowledge-card-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      font-size: 0.95rem;
-    }
-    .knowledge-card-stats > div {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .knowledge-card-stats span:first-child {
-      color: var(--text-muted);
-    }
-    .knowledge-card-stats b {
-      color: var(--text-main);
+    .knowledge-table .kb-value {
       font-weight: 600;
     }
-    .knowledge-loading {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    .knowledge-table .kb-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
+
     .knowledge-loading .skeleton {
-      height: 200px;
-      border-radius: 20px;
+      height: 60px;
+      border-radius: 12px;
     }
     .knowledge-error {
-      grid-column: 1 / -1;
       padding: 30px;
       border-radius: 20px;
       background: rgba(255,68,68,0.1);
@@ -905,8 +899,8 @@
     <div class="logo"><div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trending-up"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></div><span>VozduxInvest</span></div>
     <div class="nav-tabs">
       <a href="#" class="nav-link active" onclick="switchPage('select', event)"><i data-feather="search"></i> Подбор</a>
-      <a href="#" class="nav-link" onclick="switchPage('analytics', event)"><i data-feather="pie-chart"></i> Аналитика</a>
       <a href="#" class="nav-link" onclick="switchPage('about', event)"><i data-feather="users"></i> О нас</a>
+      <a href="#" class="nav-link" onclick="switchPage('analytics', event)"><i data-feather="pie-chart"></i> Аналитика</a>
       <a href="#" class="nav-link" onclick="switchPage('knowledge', event)"><i data-feather="book-open"></i> База знаний</a>
     </div>
   </nav>
@@ -945,7 +939,7 @@
         <div class="form-grid">
           <div class="form-group">
             <label id="amountLabel"><i data-feather="credit-card"></i> Сумма инвестиций (₽)</label>
-            <input type="number" id="amount" value="100000" min="1000">
+            <input type="number" id="amount" value="1000000" min="1000">
           </div>
           <div class="form-group">
             <label><i data-feather="calendar"></i> Горизонт планирования</label>
@@ -992,20 +986,6 @@
         </div>
         <p style="font-size: 1.1rem;">Ожидаемая годовая прибыль</p>
       </div>
-    </div>
-    <div class="stat-box">
-      <div style="display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom: 20px;">
-        <button type="button" onclick="switchTopMode(-1)" style="background:transparent; border:1px solid var(--border); color:var(--text-main); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:1.1rem;">&#8592;</button>
-        <h3 id="top5Title" style="font-size: 1.5rem; margin: 0;"><i data-feather="trending-up"></i> Топ-5 по доходности</h3>
-        <button type="button" onclick="switchTopMode(1)" style="background:transparent; border:1px solid var(--border); color:var(--text-main); width:38px; height:38px; border-radius:50%; cursor:pointer; font-size:1.1rem;">&#8594;</button>
-      </div>
-      <div id="top5List" class="top-list"></div>
-    </div>
-    <div class="stat-box" style="text-align:left; margin-top: 24px;">
-      <h3 style="font-size: 1.3rem; margin-bottom: 16px;"><i data-feather="info"></i> Как формируется топ</h3>
-      <p style="margin-bottom: 8px;">• Доход: облигации, чья доходность наиболее близка к указанной цели.</p>
-      <p style="margin-bottom: 8px;">• Рейтинг эмитента: приоритет — высокий рейтинг (низкий риск), затем доходность.</p>
-      <p style="margin-bottom: 8px;">• Минимальный риск: сначала облигации с наименьшим риском, затем близость к целевой доходности.</p>
     </div>
   </div>
 
@@ -1107,11 +1087,14 @@ function setSearchMode(mode, el) {
   document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
   el.classList.add('active');
   
+  const amountInput = document.getElementById('amount');
   const label = document.getElementById('amountLabel');
   if (mode === 'by_sum') {
     label.innerHTML = '<i data-feather="credit-card"></i> Сумма инвестиций (₽)';
+    amountInput.value = 1000000;
   } else {
     label.innerHTML = '<i data-feather="trending-up"></i> Желаемый доход в месяц (₽)';
+    amountInput.value = 1000;
   }
   feather.replace();
   
@@ -1915,6 +1898,7 @@ async function loadKnowledgeBonds() {
       <div class="skeleton"></div>
       <div class="skeleton"></div>
       <div class="skeleton"></div>
+      <div class="skeleton"></div>
     </div>
   `;
   
@@ -1939,40 +1923,43 @@ async function loadKnowledgeBonds() {
       return valB - valA; // По убыванию
     });
     
-    // Рендерим карточки
-    container.innerHTML = sorted.map((bond, index) => {
-      const price = parseFloat(bond.price) || 0;
-      const yieldP = parseFloat(bond.yield_percent) || 0;
-      const coupon = parseFloat(bond.coupon) || 0;
-      const ytm = parseFloat(bond.yield_to_maturity || bond.ytm) || 0;
-      const duration = parseInt(bond.duration) || 0;
-      
-      return `
-        <div class="knowledge-card" style="animation-delay: ${index * 0.1}s">
-          <div class="knowledge-card-header">
-            <div class="knowledge-card-name">${bond.name}</div>
-            <div class="knowledge-card-ticker">${bond.ticker}</div>
-          </div>
-          <div class="knowledge-card-yield">
-            <span>Доходность</span>
-            <span class="yield-value">${yieldP}%</span>
-          </div>
-          <div class="knowledge-card-stats">
-            <div><span>Цена</span> <b>${price} ₽</b></div>
-            <div><span>Купон</span> <b>${coupon}%</b></div>
-            <div><span>YTM</span> <b>${ytm}%</b></div>
-            <div><span>Дюрация</span> <b>${duration} мес</b></div>
-          </div>
-        </div>
-      `;
-    }).join('');
-    
-    // Запускаем анимацию появления
-    setTimeout(() => {
-      container.querySelectorAll('.knowledge-card').forEach(card => {
-        card.classList.add('visible');
-      });
-    }, 50);
+    // Рендерим таблицу-список
+    container.innerHTML = `
+      <table class="knowledge-table">
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Тикер</th>
+            <th>Доходность</th>
+            <th>Цена</th>
+            <th>Купон</th>
+            <th>YTM</th>
+            <th>Дюрация</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sorted.map(bond => {
+            const price = parseFloat(bond.price) || 0;
+            const yieldP = parseFloat(bond.yield_percent) || 0;
+            const coupon = parseFloat(bond.coupon) || 0;
+            const ytm = parseFloat(bond.yield_to_maturity || bond.ytm) || 0;
+            const duration = parseInt(bond.duration) || 0;
+            
+            return `
+              <tr onclick="showBondDetails('${bond.ticker}')">
+                <td><span class="kb-name">${bond.name}</span></td>
+                <td><span class="kb-ticker">${bond.ticker}</span></td>
+                <td><span class="kb-yield">${yieldP}%</span></td>
+                <td><span class="kb-value">${price} ₽</span></td>
+                <td><span class="kb-value">${coupon}%</span></td>
+                <td><span class="kb-value">${ytm}%</span></td>
+                <td><span class="kb-label">${duration} мес</span></td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
     
   } catch (error) {
     console.error("Ошибка загрузки базы знаний:", error);
