@@ -114,6 +114,33 @@
       position: relative;
       z-index: 10;
     }
+    /* Переключатель режимов */
+    .mode-selector {
+      display: flex;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px;
+      margin-bottom: 30px;
+      width: fit-content;
+    }
+    .mode-btn {
+      padding: 12px 24px;
+      border-radius: 16px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 0.95rem;
+    }
+    .mode-btn.active {
+      background: var(--primary);
+      color: #050914;
+      box-shadow: 0 4px 12px rgba(0, 230, 195, 0.2);
+    }
+
     .form-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
     @media (min-width: 768px) { .form-grid { grid-template-columns: 1fr 1fr; align-items: end; } }
     
@@ -171,6 +198,18 @@
     }
     .btn-main:hover { transform: translateY(-5px) scale(1.01); box-shadow: 0 20px 40px -10px rgba(0, 230, 195, 0.6); }
 
+    /* Скелетон загрузки */
+    .skeleton {
+      background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+      background-size: 200% 100%;
+      animation: loading 1.2s infinite;
+      border-radius: 8px;
+    }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
     /* Результаты */
     .results-grid { display: grid; grid-template-columns: 1fr; gap: 35px; }
     @media (min-width: 768px) { .results-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -185,6 +224,28 @@
     .bond-card.visible { opacity: 1; transform: translateY(0); }
     .bond-card:hover { border-color: var(--primary); transform: translateY(-12px); box-shadow: var(--shadow-glow); }
     
+    /* Активная карточка */
+    .bond-card.card-active {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+      background: rgba(0, 230, 195, 0.08);
+    }
+
+    /* Лучшая облигация */
+    .bond-card.best {
+      border: 1px solid rgba(0, 230, 195, 0.6);
+      box-shadow: 0 0 12px rgba(0, 230, 195, 0.2);
+    }
+
+    /* Анимация обновления данных */
+    .fade-update {
+      animation: fadeUpdate 0.4s ease-out;
+    }
+    @keyframes fadeUpdate {
+      from { opacity: 0.4; transform: scale(0.99); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     .bond-name { font-size: 1.6rem; font-weight: 800; margin-bottom: 20px; color: white; }
     .yield-display {
       background: rgba(0, 0, 0, 0.4); padding: 25px; border-radius: 20px;
@@ -199,6 +260,136 @@
     }
     .bond-card.expanded .bond-details {
       max-height: 300px; margin-top: 25px; padding-top: 25px; border-top-width: 1px;
+    }
+
+    /* Объединенный блок Вердикта и Прогноза */
+    .verdict-forecast-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+      grid-column: 1 / -1;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--glass-border);
+      padding: 40px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: var(--transition-smooth);
+    }
+    .verdict-forecast-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .verdict-forecast-container:hover {
+      border-color: var(--primary);
+      transform: translateY(-12px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    @media (min-width: 768px) {
+      .verdict-forecast-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+    }
+
+    .verdict-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding-right: 0;
+    }
+    @media (min-width: 768px) {
+      .verdict-section {
+        padding-right: 30px;
+        border-right: 1px solid var(--border);
+      }
+    }
+
+    .forecast-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      padding-left: 0;
+    }
+    @media (min-width: 768px) {
+      .forecast-section {
+        padding-left: 30px;
+      }
+    }
+
+    .verdict-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding-top: 0;
+    }
+    .verdict-header h3 {
+      color: var(--primary);
+      font-size: 1.15rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .verdict-header a {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-decoration: underline;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    .verdict-header a:hover {
+      color: var(--primary);
+    }
+
+    .forecast-header h3 {
+      color: var(--accent);
+      font-size: 1.15rem;
+      margin: 0 0 15px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .verdict-content {
+      display: grid;
+      gap: 12px;
+      font-size: 1.05rem;
+    }
+    .verdict-content > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .verdict-content span:first-child {
+      color: var(--text-muted);
+    }
+    .verdict-content b {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .forecast-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 1.05rem;
+      flex: 1;
+    }
+    .forecast-content > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .forecast-content span:first-child {
+      color: var(--text-muted);
+    }
+    .forecast-content b {
+      font-weight: 700;
     }
 
     /* Аналитика */
@@ -351,9 +542,13 @@
 
     <section class="form-section">
       <form id="bondForm">
+        <div class="mode-selector">
+          <button type="button" class="mode-btn active" onclick="setSearchMode('by_sum', this)">От суммы вложений</button>
+          <button type="button" class="mode-btn" onclick="setSearchMode('by_income', this)">От желаемого дохода</button>
+        </div>
         <div class="form-grid">
           <div class="form-group">
-            <label><i data-feather="credit-card"></i> Сумма инвестиций (₽)</label>
+            <label id="amountLabel"><i data-feather="credit-card"></i> Сумма инвестиций (₽)</label>
             <input type="number" id="amount" value="100000" min="1000">
           </div>
           <div class="form-group">
@@ -436,6 +631,25 @@
 // --- 1. НАСТРОЙКИ API ---
 const API_BASE = "http://127.0.0.1:8000";
 
+let searchMode = 'by_sum';
+let currentAmount = 0;
+let allBonds = [];       // весь ответ от бэка
+let activeBondIndex = 0; // текущая выбранная облигация
+
+function setSearchMode(mode, el) {
+  searchMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
+  
+  const label = document.getElementById('amountLabel');
+  if (mode === 'by_sum') {
+    label.innerHTML = '<i data-feather="credit-card"></i> Сумма инвестиций (₽)';
+  } else {
+    label.innerHTML = '<i data-feather="trending-up"></i> Желаемый доход в месяц (₽)';
+  }
+  feather.replace();
+}
+
 
 // Перевод рисков для интерфейса
 const riskTranslation = {
@@ -459,7 +673,7 @@ async function fetchAnalysis(amount, risk, duration) {
     const response = await fetch(`${API_BASE}/analyze/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount, risk, duration })
+      body: JSON.stringify({ amount, risk, duration, mode: searchMode })
     });
     if (!response.ok) throw new Error("Ошибка сервера: " + response.status);
     return await response.json();
@@ -581,110 +795,196 @@ function applyStrategy(type, el) {
 
 // --- 4. ОТПРАВКА ФОРМЫ И РЕНДЕР ---
 
+let currentApiData = null;
+
+function updateMainVerdict(bond, projection, explanation, required_capital) {
+  // БЭКЕНДЕРУ: Эта функция обновляет верхний блок verdict-forecast-container данными выбранной облигации.
+  // Фронтенд ожидает следующие поля в JSON-ответе от бэкенда для корректной отрисовки:
+  // - bond: объект с полями name, yield_percent, risk, duration, issuer_rating, ticker, price
+  // - projection: объект с полями estimated_lots (число), invested_amount (число), estimated_annual_income (число)
+  // - explanation: объект с полями short (строка) и full (строка), или просто строка
+  // - required_capital: число (опционально, для режима by_income)
+  // Убедитесь, что в вашей Pydantic схеме эти поля присутствуют и имеют правильные типы.
+  // Для alternatives ожидаем, что у каждой есть свои projection, explanation и required_capital,
+  // иначе используются общие из корневого ответа (currentApiData.projection и т.д.).
+  const mainBlock = document.querySelector('.verdict-forecast-container');
+  if (!mainBlock) return;
+
+  // Добавляем класс анимации
+  mainBlock.classList.remove('fade-update');
+  void mainBlock.offsetWidth; // Триггер перерисовки
+  mainBlock.classList.add('fade-update');
+
+  const hasFullExplanation = explanation && typeof explanation === 'object' && explanation.full;
+  
+  // Обновляем Вердикт
+  const verdictContent = mainBlock.querySelector('.verdict-content');
+  const verdictHeader = mainBlock.querySelector('.verdict-header');
+  
+  verdictHeader.innerHTML = `
+    <h3><i data-feather="cpu"></i> Вердикт алгоритма</h3>
+    ${hasFullExplanation ? `<a href="#" onclick="openDetailsModal(event)">подробнее</a>` : ''}
+  `;
+  
+  verdictContent.innerHTML = `
+    <div><span>Облигация:</span> <b>${bond.name}</b></div>
+    <div><span>Доходность:</span> <b>${bond.yield_percent}%</b></div>
+    <div><span>Риск:</span> <b>${riskTranslation[bond.risk] || 'Неизвестно'}</b></div>
+    <div><span>Срок:</span> <b>${bond.duration} мес.</b></div>
+    <div><span>Рейтинг эмитента:</span> <b>${bond.issuer_rating}/3</b></div>
+    ${searchMode === 'by_income' && required_capital ? `<div><span>Необходимый капитал:</span> <b style="color: var(--accent);">${Number(required_capital).toLocaleString('ru-RU')} ₽</b></div>` : ''}
+  `;
+
+  // Обновляем Прогноз
+  const forecastContent = mainBlock.querySelector('.forecast-content');
+  let forecastHTML = '';
+  if (searchMode === 'by_sum') {
+    // Режим "От суммы вложений"
+    forecastHTML = `
+      <div><span>Ориентировочно можно купить:</span> <b>${projection.estimated_lots ?? 0} шт.</b></div>
+      <div><span>Планируемо вложено:</span> <b>${Number(projection.invested_amount ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+      <div style="margin-top: auto;"><span>Ожидаемый доход за год:</span> <b style="color: white;">${Number(projection.estimated_annual_income ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+    `;
+  } else {
+    // Режим "От желаемого дохода"
+    const targetAnnualIncome = currentAmount * 12;
+    forecastHTML = `
+      <div><span>Желаемый доход за год:</span> <b>${Number(targetAnnualIncome).toLocaleString('ru-RU')} ₽</b></div>
+      <div><span>Нужно купить:</span> <b>${projection.estimated_lots ?? 0} шт.</b></div>
+      <div style="margin-top: auto;"><span>Необходимый капитал:</span> <b style="color: white;">${Number(required_capital ?? 0).toLocaleString('ru-RU')} ₽</b></div>
+    `;
+  }
+  forecastContent.innerHTML = forecastHTML;
+
+  // Обновляем данные для модалки
+  if (hasFullExplanation) {
+    mainBlock.dataset.fullExplanation = explanation.full;
+  } else {
+    delete mainBlock.dataset.fullExplanation;
+  }
+
+  feather.replace();
+}
+
+// Одна функция-рендерер для главного блока
+function renderMainBlock(bondData) {
+  const bond = bondData.bond;
+  const projection = bondData.projection || {};
+  const explanation = bondData.explanation;
+  const required_capital = bondData.required_capital;
+
+  updateMainVerdict(bond, projection, explanation, required_capital);
+}
+
 document.getElementById('bondForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
-  // Собираем данные
   const amount = parseInt(document.getElementById('amount').value) || 50000;
+  currentAmount = amount; // Сохраняем для использования в updateMainVerdict
   const term = parseInt(termInput.value) || 12;
   const strategyText = document.querySelector('.strategy-card.active h4').innerText.toLowerCase();
-  const risk = strategyToRisk[strategyText] || 1; // Превращаем стратегию в 1, 2 или 3
+  const risk = strategyToRisk[strategyText] || 1;
 
   const container = document.getElementById('results');
-  container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--primary); font-size: 1.2rem;"><i data-feather="loader" style="animation: spin 2s linear infinite;"></i> Связь с ИИ-аналитиком...</div>';
-  feather.replace();
+  container.innerHTML = `
+    <div style="grid-column: 1/-1; display: flex; flex-direction: column; gap: 20px;">
+      <div class="skeleton" style="height: 200px; border-radius: 20px;"></div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        <div class="skeleton" style="height: 300px; border-radius: 20px;"></div>
+        <div class="skeleton" style="height: 300px; border-radius: 20px;"></div>
+        <div class="skeleton" style="height: 300px; border-radius: 20px;"></div>
+      </div>
+    </div>
+  `;
 
-  // Идем на бэкенд
-  const apiData = await fetchAnalysis(amount, risk, term);
-
+  currentApiData = await fetchAnalysis(amount, risk, term);
   container.innerHTML = '';
 
-  if (!apiData) {
+  if (!currentApiData) {
     container.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; border-radius: 20px; background: rgba(255,68,68,0.1); border: 1px solid #ff4444; color: #ff4444; text-align: center;">Сервер не отвечает...</div>';
     return;
   }
 
-  // Рисуем вердикт системы, если есть
-  if (apiData.best_bond) {
-    const exDiv = document.createElement('div');
-    exDiv.className = 'bond-card visible';
-    exDiv.style.gridColumn = '1 / -1';
-    exDiv.style.background = 'rgba(0, 230, 195, 0.05)';
-    exDiv.style.position = 'relative';
-    
-    const bond = apiData.best_bond;
-    const hasFullExplanation = apiData.explanation && typeof apiData.explanation === 'object' && apiData.explanation.full;
-    
-    let explanationText = '';
-    if (apiData.explanation) {
-      if (typeof apiData.explanation === 'object' && apiData.explanation.short) {
-        explanationText = apiData.explanation.short;
-      } else if (typeof apiData.explanation === 'string') {
-        explanationText = apiData.explanation;
-      }
-    }
-    
-    exDiv.innerHTML = `
-      <h3 style="color:var(--primary); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
-        <span><i data-feather="cpu"></i> Вердикт алгоритма</span>
-        ${hasFullExplanation ? '<a href="#" style="color: var(--text-muted); font-size: 0.9rem; text-decoration: underline; cursor: pointer; font-weight: 600;" onclick="openDetailsModal(event)">подробнее</a>' : ''}
-      </h3>
-      <div style="display: grid; gap: 12px; font-size: 1.05rem;">
-        <div><span style="color: var(--text-muted);">Облигация:</span> <b style="color: var(--primary);">${bond.name}</b></div>
-        <div><span style="color: var(--text-muted);">Доходность:</span> <b style="color: var(--primary);">${bond.yield_percent}%</b></div>
-        <div><span style="color: var(--text-muted);">Риск:</span> <b>${riskTranslation[bond.risk] || 'Неизвестно'}</b></div>
-        <div><span style="color: var(--text-muted);">Срок:</span> <b>${bond.duration} мес.</b></div>
-        <div><span style="color: var(--text-muted);">Рейтинг эмитента:</span> <b>${bond.issuer_rating}/3</b></div>
-      </div>
-    `;
-    
-    // Сохраняем full explanation для модала
-    if (hasFullExplanation) {
-      exDiv.dataset.fullExplanation = apiData.explanation.full;
-    }
-    
-    container.appendChild(exDiv);
-  }
+  // Создаем пустой главный блок (он заполнится через updateMainVerdict)
+  const mainContainer = document.createElement('div');
+  mainContainer.className = 'verdict-forecast-container visible';
+  mainContainer.innerHTML = `
+    <div class="verdict-section"><div class="verdict-header"></div><div class="verdict-content"></div></div>
+    <div class="forecast-section"><div class="forecast-header"><h3><i data-feather="bar-chart-2"></i> Прогноз по облигации</h3></div><div class="forecast-content"></div></div>
+  `;
+  container.appendChild(mainContainer);
 
-  if (apiData.projection) {
-    const proj = apiData.projection;
-    const projDiv = document.createElement('div');
-    projDiv.className = 'bond-card visible';
-    projDiv.style.gridColumn = '1 / -1';
-    projDiv.innerHTML = `
-      <h3 style="color:var(--accent); margin-bottom: 14px;"><i data-feather="bar-chart-2"></i> Прогноз по выбранной облигации</h3>
-      <div style="display:grid; gap:10px; font-size:1.05rem;">
-        <div>Ориентировочно можно купить: <b>${proj.estimated_lots ?? 0}</b> шт.</div>
-        <div>Планируемо вложено: <b>${Number(proj.invested_amount ?? 0).toLocaleString('ru-RU')} ₽</b></div>
-        <div>Ожидаемый доход за год: <b style="color:var(--primary)">${Number(proj.estimated_annual_income ?? 0).toLocaleString('ru-RU')} ₽</b></div>
-      </div>
-    `;
-    container.appendChild(projDiv);
-  }
-
-  // Рисуем лучшую облигацию
-  if (apiData.best_bond) {
-    container.appendChild(createRealCard(apiData.best_bond, true));
-  }
-
-  // Рисуем альтернативы
-  if (apiData.alternatives && apiData.alternatives.length > 0) {
-    apiData.alternatives.forEach(bond => {
-      container.appendChild(createRealCard(bond, false));
+  // Собираем все облигации в один список для удобства
+  // БЭКЕНДЕРУ: Мы собираем best_bond и alternatives в единый массив allBonds в памяти фронтенда.
+  // Это позволяет избежать лишних запросов к API при переключении между карточками облигаций.
+  // При клике на карточку мы просто берем сохраненные данные из allBonds и обновляем верхний блок,
+  // не делая дополнительных fetch-запросов. Это оптимизирует UX и снижает нагрузку на сервер.
+  allBonds.length = 0; // Очищаем предыдущие данные
+  if (currentApiData.best_bond) {
+    allBonds.push({
+      bond: currentApiData.best_bond,
+      projection: currentApiData.projection,
+      explanation: currentApiData.explanation,
+      required_capital: currentApiData.required_capital,
+      isBest: true
     });
   }
+  
+  if (currentApiData.alternatives) {
+    currentApiData.alternatives.forEach(alt => {
+      // Для альтернатив используем их собственные проекции, если они есть, иначе общие (упрощение для демо)
+      allBonds.push({
+        bond: alt,
+        projection: alt.projection || currentApiData.projection, 
+        explanation: alt.explanation || null,
+        required_capital: alt.required_capital || currentApiData.required_capital,
+        isBest: false
+      });
+    });
+  }
+
+  // Защита от пустого состояния
+  if (!allBonds.length) {
+    container.innerHTML = '<div style="grid-column: 1/-1; padding: 30px; border-radius: 20px; background: rgba(255,68,68,0.1); border: 1px solid #ff4444; color: #ff4444; text-align: center;">Нет доступных облигаций для анализа</div>';
+    return;
+  }
+
+  // Сбрасываем выбор
+  activeBondIndex = 0;
+
+  // Рендерим карточки
+  allBonds.forEach((item, index) => {
+    const card = createRealCard(item, index);
+    container.appendChild(card);
+  });
+
+  // Инициализируем главный блок данными первой карточки
+  renderMainBlock(allBonds[0]);
   
   feather.replace();
 });
 
-// Генерация карточки из реальных данных
-function createRealCard(bond, isBest) {
+function handleCardClick(index) {
+  activeBondIndex = index;
+
+  // обновляем главный блок
+  renderMainBlock(allBonds[index]);
+
+  // обновляем активную карточку
+  document.querySelectorAll('.bond-card').forEach((card, i) => {
+    card.classList.toggle('card-active', i === index);
+  });
+}
+
+function createRealCard(item, index) {
+  // БЭКЕНДЕРУ: Эта функция создает интерактивную карточку облигации.
+  // Карточка теперь работает как "таб" (переключатель): при клике она обновляет верхний блок verdict-forecast-container.
+  // Вся информация на карточке видна сразу (нет аккордеона). Event Listener просто передает сохраненные данные
+  // (bond, projection, explanation) в функцию updateMainVerdict для обновления верхнего блока.
+  // Это позволяет мгновенно переключаться между облигациями без дополнительных запросов к API.
+  const { bond, isBest } = item;
   const card = document.createElement('div');
-  card.className = 'bond-card visible';
-  if (isBest) {
-    card.style.borderColor = 'var(--primary)';
-    card.style.boxShadow = 'var(--shadow-glow)';
-  }
+  card.className = `bond-card visible ${index === activeBondIndex ? 'card-active' : ''} ${isBest ? 'best' : ''}`;
   
   card.innerHTML = `
     ${isBest ? '<div style="color:var(--primary); font-weight:800; font-size:0.8rem; letter-spacing:1px; margin-bottom:15px; text-transform:uppercase;">★ Лучший выбор</div>' : ''}
@@ -701,13 +1001,14 @@ function createRealCard(bond, isBest) {
       <span style="color: var(--text-muted);">Цена</span>
       <span style="font-weight: 700;">${bond.price} ₽</span>
     </div>
-    <div class="bond-details">
-      <p style="margin-top: 15px;">Срок: ${bond.duration} мес.</p>
+    <div style="border-top: 1px solid var(--border); margin-top: 15px; padding-top: 15px; font-size: 1rem; color: var(--text-muted);">
+      <p>Срок: ${bond.duration} мес.</p>
       <p>Риск: ${riskTranslation[bond.risk] || 'Неизвестно'}</p>
-      <p style="margin-top: 15px; color: var(--primary);">Нажмите, чтобы скрыть детали</p>
     </div>
   `;
-  card.addEventListener('click', () => card.classList.toggle('expanded'));
+
+  card.addEventListener('click', () => handleCardClick(index));
+
   return card;
 }
 
