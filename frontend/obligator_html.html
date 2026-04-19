@@ -526,6 +526,126 @@
       filter: blur(8px);
       pointer-events: none;
     }
+
+    /* Центрирование переключателя режима */
+    .mode-selector {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Мобильная адаптация */
+    @media (max-width: 768px) {
+      .strategy-menu {
+        grid-template-columns: 1fr;
+      }
+
+      .strategy-card {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        gap: 15px;
+        padding: 20px;
+      }
+
+      .strategy-card i {
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+
+      .strategy-card h4 {
+        margin-bottom: 4px;
+      }
+
+      .strategy-card p {
+        font-size: 0.9rem;
+      }
+
+      .verdict-section {
+        padding-right: 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+      }
+
+      .forecast-section {
+        padding-left: 0;
+      }
+
+      .form-section {
+        padding: 25px;
+      }
+
+      input {
+        padding: 16px;
+        font-size: 1rem;
+      }
+
+      .btn-main {
+        padding: 18px;
+        font-size: 1.1rem;
+      }
+
+      .bond-card {
+        padding: 25px;
+      }
+
+      .yield-val {
+        font-size: 1.6rem;
+      }
+
+      .app-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+        border-radius: 25px;
+      }
+
+      .logo {
+        justify-content: center;
+        font-size: 1.4rem;
+      }
+
+      .nav-tabs {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+      }
+
+      .nav-link {
+        flex: 1;
+        justify-content: center;
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+
+      .strategy-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        text-align: left;
+      }
+
+      .strategy-card i {
+        margin: 0;
+        flex-shrink: 0;
+      }
+
+      .strategy-card h4,
+      .strategy-card p {
+        margin: 0;
+      }
+
+      .strategy-card h4 {
+        margin-bottom: 6px;
+      }
+
+      .strategy-text {
+        display: flex;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
@@ -546,18 +666,24 @@
     <div class="strategy-menu">
       <div class="strategy-card active" onclick="applyStrategy('safe', this)">
         <i data-feather="shield"></i>
-        <h4>Консерватор</h4>
-        <p>Максимальная защита капитала</p>
+        <div class="strategy-text">
+          <h4>Консерватор</h4>
+          <p>Максимальная защита капитала</p>
+        </div>
       </div>
       <div class="strategy-card" onclick="applyStrategy('balanced', this)">
         <i data-feather="activity"></i>
-        <h4>Баланс</h4>
-        <p>Оптимальное соотношение риска и доходности</p>
+        <div class="strategy-text">
+          <h4>Баланс</h4>
+          <p>Оптимальное соотношение риска и доходности</p>
+        </div>
       </div>
       <div class="strategy-card" onclick="applyStrategy('aggressive', this)">
         <i data-feather="zap"></i>
-        <h4>Агрессивный</h4>
-        <p>Максимальный рост купонного дохода</p>
+        <div class="strategy-text">
+          <h4>Агрессивный</h4>
+          <p>Максимальный рост купонного дохода</p>
+        </div>
       </div>
     </div>
 
